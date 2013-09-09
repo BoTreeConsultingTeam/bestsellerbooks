@@ -1,0 +1,19 @@
+%header.navbar.navbar-inverse
+  %nav.navbar-inner
+    .container-fluid 
+      %a.brand Bestseller Books
+.container
+  - if @data.present?
+    %ul.thumbnails
+      - @data.each do |item|
+        %li.span4
+          .thumbnail
+            %img{:alt => "", :src => "#{item[:img]}"}
+              %p
+                =item[:title]
+                ,
+                %strong By:
+                =item[:author]
+              %p
+                %strong Price(₹):
+                = item[:price].gsub(/\D/,'') if item[:price]
