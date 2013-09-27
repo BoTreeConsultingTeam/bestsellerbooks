@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  book_details_id: 1
+  crossword_price: 1
+  flipkart_price: 1
+  landmarkonthenet_price: 1
+  infibeam_price: 1
+
+two:
+  book_details_id: 1
+  crossword_price: 1
+  flipkart_price: 1
+  landmarkonthenet_price: 1
+  infibeam_price: 1

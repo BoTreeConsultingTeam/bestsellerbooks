@@ -1,0 +1,137 @@
+<div class="row">
+<div class="row">
+</br></br>
+  <div class="span8 offset1">
+  <table>
+      <tr>
+        <td>
+          <table class="table table-striped">
+            <tr>
+              <th colspan="2">
+                <%= @show_book_details[:title] %>
+              </th>
+            </tr>
+            <tr>
+               <td colspan="2">
+                <%= image_tag("#{@show_book_details[:images]}") %>
+               </td>  
+            </tr>
+            <tr>  
+              <td>
+                <%= "Author :" %>
+              </td>
+               <td>
+                <%= @show_book_details[:author] %>
+               </td>  
+            </tr>
+            <tr>  
+              <td>
+                <%= "ISBN :" %>
+              </td>   
+               <td>
+                <%= @show_book_details[:isbn] %>
+               </td>
+            </tr>
+            <tr>  
+              <td>
+                <%= "Publisher :" %>
+              </td>   
+               <td>
+                <%= @show_book_details[:publisher] %>
+               </td>
+            </tr>
+            <tr>  
+              <td>
+                <%= "Language :" %>
+              </td>   
+               <td>
+                <%= @show_book_details[:language] %>
+               </td>
+            </tr>
+          </table>
+        </td>
+        <td width="100px">
+        </td>
+        <td  valign="top">
+          <table class="table table-striped">
+            <tr>
+              <th>
+                <%= "Website" %>
+              </th>
+              <th width="20px"></th>
+              <th>
+                 <%= "Price" %>
+              </th>
+            </tr>
+            <tr>
+              <td>
+                 <%= "Crossword Price" %>
+              </td>
+              <td width="20px"></td>
+              <td>
+                <% if @show_book_details.book_price[:crossword_price].nil? %>
+                  <%= "-" %>
+                <% else %>
+                  <%= @show_book_details.book_price[:crossword_price] %>
+                <% end %> 
+              </td>
+            </tr>
+            <tr>
+              <td>
+                 <%= "Flipkart Price" %>
+              </td>
+              <td width="20px"></td>
+              <td>
+                <% if @show_book_details.book_price[:flipkart_price].nil? %>
+                  <%= "-" %>
+                <% else %>
+                  <%= @show_book_details.book_price[:flipkart_price] %>
+                <% end %> 
+              </td>
+            </tr>
+            <tr>
+              <td>
+                 <%= "Landmarkonthenet Price" %>
+              </td>
+              <td width="20px"></td>
+              <td>                
+                <% if @show_book_details.book_price[:landmarkonthenet_price].nil? %>
+                  <%= "-" %>
+                <% else %>
+                  <%= @show_book_details.book_price[:landmarkonthenet_price] %>
+                <% end %> 
+              </td>
+            </tr>
+            <tr>
+              <td>
+                 <%= "Infibeam Price" %>
+              </td>
+              <td width="20px"></td>
+              <td>
+                <% if @show_book_details.book_price[:infibeam_price].nil? %>
+                  <%= "-" %>
+                <% else %>
+                  <%= @show_book_details.book_price[:infibeam_price] %>
+                <% end %> 
+              </td>
+            </tr>
+            <tr>
+              <td>
+                 <%= "Amazon Price" %>
+              </td>
+              <td width="20px"></td>
+              <td>
+                <% if @show_book_details.book_price[:amazon_price].nil? %>
+                  <%= "-" %>
+                <% else %>
+                  <%= @show_book_details.book_price[:amazon_price] %>
+                <% end %>                
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+  </table>
+  </div>
+</div>
+</div>

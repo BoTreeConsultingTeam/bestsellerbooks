@@ -1,6 +1,9 @@
 Bestsellerbooks::Application.routes.draw do
+  #root :to => 'scrappers#price_details'  
+  root :to => 'scrappers#show_latest_books'
   get "scrappers/show_latest_books"
-
+  get 'scrappers/price_details', to: "scrappers#price_details", as: 'price_details'
+  get 'scrappers/refresh_details', to: 'scrappers#refresh_details', as: 'refresh_details'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -50,7 +53,6 @@ Bestsellerbooks::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => 'scrappers#show_latest_books'
 
   # See how all your routes lay out with "rake routes"
 

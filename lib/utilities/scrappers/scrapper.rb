@@ -6,21 +6,21 @@ module Utilities
 
     class Scrapper
       
-      attr_accessor :page, :book_details
+      attr_accessor :page, :book_details, :isbn_page, :isbn
 
       def initialize(url)
         agent = Mechanize.new
         @page = agent.get(url)
         @book_details = []
       end
-
+      def initialize_isbn(url)
+        agent = Mechanize.new
+        @isbn_page = agent.get(url)
+      end
       def add_book_details(map)
-        @book_details<<map
+        @book_details << map
       end
-
-      def process_page
-
-      end
+      
 
       #
       # Public methods for creating new instance...
@@ -42,6 +42,9 @@ module Utilities
         Utilities::Scrappers::CrosswordScrapper.new
       end
 
+      def self.create_new_amazon_scrapper
+        Utilities::Scrappers::AmazonScrapper.new
+      end
     end
 
   end

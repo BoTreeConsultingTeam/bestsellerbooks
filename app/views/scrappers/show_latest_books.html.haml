@@ -3,17 +3,21 @@
     .container-fluid 
       %a.brand Bestseller Books
 .container
+  = link_to "refresh", refresh_details_path
+  = paginate @data
   - if @data.present?
     %ul.thumbnails
-      - @data.each do |item|
+      -@data.each do |item|
         %li.span4
           .thumbnail
-            %img{:alt => "", :src => "#{item[:img]}"}
-              %p
-                =item[:title]
-                ,
-                %strong By:
-                =item[:author]
-              %p
-                %strong Price(₹):
-                = item[:price].gsub(/\D/,'') if item[:price]
+            %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+              %img{:alt => "", :src => "#{item[:images]}"}
+            %p
+              =item[:title]
+              ,
+              %strong By:
+              =item[:author]
+              ,
+              %strong ISBN:
+              =item[:isbn]
+  = paginate @data

@@ -1,6 +1,5 @@
 module Utilities
   module Scrappers
-
     class CrosswordScrapper < Scrapper
       
       URL = 'http://www.crossword.in/see_more_pages/books-best-sellers-seemore-data'
@@ -15,16 +14,37 @@ module Utilities
         li.each_with_index { |li_item, index|
           title = li_item.search('.variant-title a').attr('title').text()
           author = li_item.search('.contributors .ctbr-name a').text()
-          price = li_item.search('.price .variant-final-price').text().strip!
+          price = li_item.search('.variant-desc .price .variant-final-price').text().strip!
           img_url = li_item.search('.variant-image a img').attr('src').text()
-          li_map = {
+          href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text()
+          details = process_isbn_page(href_url)
+          li_map = { "#{details[:ISBN]}" => {
             img: img_url,
-            price: price,
             author: author,
-            title: title
-          }
+            title: title,
+            language: details[:language],
+            publisher: details[:publisher],
+            price_list: { crossword_price: price.gsub(/\D/,'') }
+          }}
           add_book_details(li_map)
         }
+      end
+      def process_isbn_page(href_url)
+        details = {}
+        initialize_isbn(href_url)
+        find_label = isbn_page.search('#features ul li')
+        find_label.each_with_index { |li_item, index| 
+          if li_item.search('label').text().strip == "EAN"
+            details.merge!({"ISBN".to_sym => li_item.text().strip.gsub(/\D/,'')})      
+          elsif li_item.search('label').text().strip == "Publisher"
+            publisher = (li_item.text().strip.gsub(/Publisher/,'')).to_s
+            details.merge!({"publisher".to_sym => publisher.gsub(/\W/,'')})
+          elsif li_item.search('label').text().strip == "Language"
+            language = (li_item.text().strip.gsub(/Language/,'')).to_s
+            details.merge!({"language".to_sym => language.gsub(/\W/,'')})
+          end
+        }   
+        details
       end
     end
   end
