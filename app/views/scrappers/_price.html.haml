@@ -1,0 +1,57 @@
+.row{style: "margin-left: -11px;"}
+  .span7
+    %table
+      %tr
+        %td{style: "width: 350px;"}
+          %table.table.table-striped
+            %tr
+              %th{colspan: "2"}
+                = @show_book_details[:title]
+            %tr
+              %td{colspan: "2",valign: "center"}
+                = image_tag("#{@show_book_details[:images]}")
+            %tr
+              %td{style: "width: 85px;"}
+                = "Author :"
+              %td
+                = @show_book_details[:author]
+            %tr
+              %td
+                = "ISBN :"
+              %td
+                = @show_book_details[:isbn]
+            %tr
+              %td
+                = "Publisher :"
+              %td
+                = @show_book_details[:publisher]
+            %tr
+              %td
+                = "Language :"
+              %td
+                = @show_book_details[:language]
+        %td{width: "100px"}
+        %td{valign: "top",style: "width: 270px;"}
+          %table.table.table-striped
+            %tr
+              %td
+                = "Site"
+              %td
+                = "Price"
+              %td
+                = "Discount"
+            - @price_list.each do |price|
+              %tr
+                %td
+                  = s = Site.site_name(price[:site_id])
+                %td
+                  - if !price[:price].nil?
+                    = link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
+                  - else
+                    = "-"
+                %td
+                  - if !price[:discount].nil?
+                    = link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
+                    \%
+                  - else
+                    = "-"

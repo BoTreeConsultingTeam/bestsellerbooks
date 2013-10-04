@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130927105939) do
+ActiveRecord::Schema.define(:version => 20131003115032) do
 
   create_table "book_details", :force => true do |t|
     t.text     "images"
@@ -24,15 +24,20 @@ ActiveRecord::Schema.define(:version => 20130927105939) do
     t.string   "language"
   end
 
-  create_table "book_prices", :force => true do |t|
-    t.integer  "crossword_price"
-    t.integer  "flipkart_price"
-    t.integer  "landmarkonthenet_price"
-    t.integer  "infibeam_price"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
+  create_table "book_meta", :force => true do |t|
     t.integer  "book_detail_id"
-    t.integer  "amazon_price"
+    t.integer  "site_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.integer  "price"
+    t.integer  "discount"
+    t.string   "book_detail_url"
+  end
+
+  create_table "sites", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
 end

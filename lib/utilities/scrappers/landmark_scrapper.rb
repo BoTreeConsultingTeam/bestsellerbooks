@@ -11,20 +11,22 @@ module Utilities
       def process_page
         li = page.search('#main-column section.productblock article.product')
         list = []
+        site_id = Site.find_by_name("landmarkonthenet")
         li.each_with_index { |li_item, index|
           title = li_item.search('.info h1 a').attr('title').text()
           author = li_item.search('.info h2 a').text()
           price = li_item.search('.buttons .prices .pricelabel').text().gsub(/\D/,'')
           img_url = li_item.search('.image a img').attr('src').text()
           href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text()
+          discount = li_item.search('.image .discount').text().strip.gsub(/\D/,'')
           details = process_isbn_page(href_url)
           li_map = { "#{details[:ISBN]}" => {
             img: img_url,
             author: author,
             title: title,
             language: details[:language],
-            publisher: details[:publisher],        
-            price_list: { landmarkonthenet_price: price }
+            publisher: details[:publisher],               
+            book_meta_data: {"#{site_id[:id]}" => {price: price,discount: discount,book_detail_url: href_url }}
           }}
           add_book_details(li_map)
         }

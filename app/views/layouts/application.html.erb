@@ -6,9 +6,15 @@
   <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
   <%= csrf_meta_tags %>
 </head>
+
 <body>
 
+<%= render partial: "layouts/navigation" %>
 <%= yield %>
+
 <div id="dialog" title="Books details"></div>
+
 </body>
+<div class="ajax-progress"></div>
 </html>
+

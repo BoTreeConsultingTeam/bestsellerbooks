@@ -11,9 +11,10 @@ module Utilities
       def process_page
         li = page.search('#staticpage .boxinnerbig ul li')
         list = []
+        site_id = Site.find_by_name("infibeam")
         li.each_with_index { |li_item, index|
           title = li_item.search('a:first img').attr('title').text()
-          author = li_item.search('a').text().gsub(/\D/,'')
+          author = li_item.search('a').text().gsub(/by/,'')
           price = li_item.search('.price span.normal').text()
           img_url = li_item.search('a:first img').attr('src').text()
           href_url =  'http://www.infibeam.com' + li_item.search('a:first').attr('href').text()
@@ -23,8 +24,8 @@ module Utilities
             author: author,
             title: title,
             language: details[:language],
-            publisher: details[:publisher], 
-            price_list: { infibeam_price: price }
+            publisher: details[:publisher],            
+            book_meta_data: {"#{site_id[:id]}" => {price: price,discount: details[:infibeam_price_discount],book_detail_url: href_url }}
           }}
           add_book_details(li_map)
         }
@@ -32,18 +33,17 @@ module Utilities
       def process_isbn_page(href_url)
         details = {}
         initialize_isbn(href_url)
-        find_label = isbn_page.search('#ib_products table')
-        tr = find_label.search('tr')
-        tr.each_with_index { |tr_items, index|
-          td =  tr_items.search('td')[0]
-          if td.text().strip == "EAN:"
-            details.merge!({"ISBN".to_sym => tr_items.search('td .simple').text().strip})
-          elsif tr_items.search('b').text().strip == "Publisher:"
-            details.merge!({"publisher".to_sym => tr_items.search('td a').text()})
-          elsif td.text().strip == "Language:"
-            details.merge!({"language".to_sym => tr_items.search('td')[1].text().strip})
-          end
+        td = isbn_page.search('#ib_products table td')
+        td.each_with_index { |td_items, index|
+          if td_items.text().strip == "EAN:"
+            details.merge!({"ISBN".to_sym => td[index+1].text().strip})
+          elsif td_items.text().strip == "Publisher:"
+            details.merge!({"publisher".to_sym => td[index+1].text().strip})
+          elsif td_items.text().strip == "Language:"
+            details.merge!({"language".to_sym => td[index+1].text().strip})
+          end        
         }
+        details.merge!({"infibeam_price_discount".to_sym => isbn_page.search('#priceDiv .gola .yousaveper').text().strip})
         details
       end
     end
