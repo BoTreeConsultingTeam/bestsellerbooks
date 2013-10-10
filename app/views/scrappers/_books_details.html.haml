@@ -1,28 +1,35 @@
-#my_div.container
-  = link_to "refresh", refresh_details_path
-  - if @data.present?
-    .pagination.pagination-right
+.row
+  .pagination.pagination-right
+    - if !@data.nil?
       = paginate @data, :params => {:action => 'show'}, remote: true
-    - @data.each_slice(4).to_a.each do |row| 
-      .row-fluid
-        %ul.thumbnails
-          -row.each do |item|
-            %li.span3
-              %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
-                .thumbnail{style: "height: 300px; padding-top: 7px;"}            
-                  %img{:alt => "", :src => "#{item[:images]}"}
+  .span10
+    = link_to "refresh", refresh_details_path
+    - if !@data.nil?
+      - @data.each_slice(4).to_a.each do |row| 
+        .row-fluid
+          %ul.thumbnails
+            -row.each do |item|
+              %li.span3
+                .thumbnail{style: "height: 300px; padding-top: 7px;",class: "thumbnail_book"}
+                  %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                    %img{:alt => "", :src => "#{item[:images]}"}
                   %p
-                    =item[:title]
+                    %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                      =item[:title]
                   %p
-                    %strong By:
-                    =item[:author]
+                    %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                      %strong By:
+                      =item[:author]
                   %p
-                    %strong Best Buy Price:
-                    - min_price = BookDetail.book_price(item).first
-                    = min_price[:price]
-    .pagination.pagination-right
-      = paginate @data, :params => {:action => 'show'}, remote: true
-  - else
-    %p
+                    %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                      %strong Best Buy Price:
+                      - min_price = BookDetail.book_price(item).first
+                      = min_price[:price]
+    - else
       %p
-        %strong No records found
+        %p
+          %strong No records found
+.row
+  .pagination.pagination-right
+    - if !@data.nil?
+      = paginate @data, :params => {:action => 'show'}, remote: true

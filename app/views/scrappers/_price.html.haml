@@ -30,6 +30,19 @@
                 = "Language :"
               %td
                 = @show_book_details[:language]
+            %tr
+              %td
+                = "Category :"
+              %td
+                - if !@category_details.nil?
+                  - category = BookCategory.find(@category_details[:book_category_id])
+                  = link_to category[:category], show_books_by_category_path(category[:id]),method: :get,class: "book_category_link",remote: true
+            %tr
+              %td
+                = "Average Rating :"
+              %td
+                = hidden_field_tag 'avg_rating', @avg_rating
+                #star
         %td{width: "100px"}
         %td{valign: "top",style: "width: 270px;"}
           %table.table.table-striped
@@ -40,10 +53,14 @@
                 = "Price"
               %td
                 = "Discount"
+              %td
+                = "Rating"
+            - index = 0
             - @price_list.each do |price|
               %tr
                 %td
-                  = s = Site.site_name(price[:site_id])
+                  - s = Site.site_name(price[:site_id]).first
+                  = s[:name]
                 %td
                   - if !price[:price].nil?
                     = link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
@@ -55,3 +72,14 @@
                     \%
                   - else
                     = "-"
+                %td
+                  - if !price[:rating].nil?
+                    = hidden_field_tag "rating_#{index}", price[:rating]
+                    .separate_star_rating{id: "star_#{index}"}
+                    - index = index + 1
+                  - else
+                    = "-"
+
+    - if !@show_book_details[:description].nil?
+      .description_div
+        = @show_book_details[:description].html_safe

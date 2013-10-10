@@ -1,0 +1,5 @@
+.span10
+	= hidden_field_tag "search_data", @search_data
+	= form_tag show_path, method: :get,remote: true,class: "navbar-search pull-right" do
+		= text_field_tag :search
+		= submit_tag "search", class: "btn btn-success",id: 'search-ajax',style: "margin-top: -9px; height: 31px;"

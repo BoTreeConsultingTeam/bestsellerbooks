@@ -9,23 +9,24 @@ module Utilities
       end
 
       def process_page
-        li = page.search('#main-column section.productblock article.product')
+        li = page.search('#main-column section.productblock article.product')[1..10]
         list = []
         site_id = Site.find_by_name("landmarkonthenet")
         li.each_with_index { |li_item, index|
-          title = li_item.search('.info h1 a').attr('title').text()
-          author = li_item.search('.info h2 a').text()
+          title = li_item.search('.info h1 a').attr('title').text().squish.strip
+          author = li_item.search('.info h2 a').text().squish.strip
           price = li_item.search('.buttons .prices .pricelabel').text().gsub(/\D/,'')
           img_url = li_item.search('.image a img').attr('src').text()
           href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text()
           discount = li_item.search('.image .discount').text().strip.gsub(/\D/,'')
-          details = process_isbn_page(href_url)
-          li_map = { "#{details[:ISBN]}" => {
+          meta = process_isbn_page(href_url)
+          li_map = { "#{meta[0][:ISBN]}" => {
             img: img_url,
             author: author,
             title: title,
-            language: details[:language],
-            publisher: details[:publisher],               
+            language: meta[0][:language],
+            publisher: meta[0][:publisher],
+            category: meta[1],
             book_meta_data: {"#{site_id[:id]}" => {price: price,discount: discount,book_detail_url: href_url }}
           }}
           add_book_details(li_map)
@@ -33,6 +34,7 @@ module Utilities
       end
       def process_isbn_page(herf_url)
         details = {}
+        meta = []
         initialize_isbn(herf_url)
         find_label = isbn_page.search('#tabwrapper ul.blank li')
         find_label.each_with_index { |li_item, index|
@@ -46,8 +48,17 @@ module Utilities
             language = (li_item.text().strip.gsub(/Language:/,'')).to_s
             details.merge!({"language".to_sym => language.gsub(/\W/,'')}) 
           end          
-        }    
-        details
+        }
+        a = isbn_page.search('#product-breadcrumbs li a')
+        category= []
+        a.each_with_index { |a_item,index|
+          if a_item.text() != "Books" || a_item.text() != "Home"
+            category << a_item.text().squish.gsub(/\n/, '').strip
+          end
+        }
+        meta << details
+        meta << category
+        meta
       end
     end
   end

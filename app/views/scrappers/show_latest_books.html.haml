@@ -1,1 +1,10 @@
-#books= render :partial => 'books_details'
+.container-fluid
+  .row
+    .span10
+      = render :partial => 'search'	
+  .row
+    .span2
+      = render :partial => 'category'
+    .span10
+      %label.categor_label{ style: "font-weight: bold; font-size: 30px; color: #0088CC" }
+      #books= render :partial => 'books_details'

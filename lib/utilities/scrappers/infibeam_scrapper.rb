@@ -9,29 +9,31 @@ module Utilities
       end
 
       def process_page
-        li = page.search('#staticpage .boxinnerbig ul li')
+        li = page.search('#staticpage .boxinnerbig ul li')[1..10]
         list = []
         site_id = Site.find_by_name("infibeam")
         li.each_with_index { |li_item, index|
-          title = li_item.search('a:first img').attr('title').text()
-          author = li_item.search('a').text().gsub(/by/,'')
+          title = li_item.search('a:first img').attr('title').text().squish.strip
+          author = li_item.search('a').text().gsub(/by/,'').squish.strip
           price = li_item.search('.price span.normal').text()
           img_url = li_item.search('a:first img').attr('src').text()
           href_url =  'http://www.infibeam.com' + li_item.search('a:first').attr('href').text()
-          details = process_isbn_page(href_url)
-          li_map = { "#{details[:ISBN]}" => {
+          meta = process_isbn_page(href_url)
+          li_map = { "#{meta[0][:ISBN]}" => {
             img: img_url,
             author: author,
             title: title,
-            language: details[:language],
-            publisher: details[:publisher],            
-            book_meta_data: {"#{site_id[:id]}" => {price: price,discount: details[:infibeam_price_discount],book_detail_url: href_url }}
+            language: meta[0][:language],
+            publisher: meta[0][:publisher],            
+            category: nil,           
+            book_meta_data: {"#{site_id[:id]}" => { price: price,discount: meta[0][:infibeam_price_discount],book_detail_url: href_url }}
           }}
           add_book_details(li_map)
         }
       end
       def process_isbn_page(href_url)
         details = {}
+        meta = []
         initialize_isbn(href_url)
         td = isbn_page.search('#ib_products table td')
         td.each_with_index { |td_items, index|
@@ -43,8 +45,11 @@ module Utilities
             details.merge!({"language".to_sym => td[index+1].text().strip})
           end        
         }
+        rating = isbn_page.search('#ib_details .hreview-aggregate .rating .average').text()
         details.merge!({"infibeam_price_discount".to_sym => isbn_page.search('#priceDiv .gola .yousaveper').text().strip})
-        details
+        meta << details
+        meta << rating
+        meta
       end
     end
   end

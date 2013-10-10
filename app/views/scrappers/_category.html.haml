@@ -1,0 +1,4 @@
+.span2
+  - @book_category.each do |c|
+    %label.check_box_categor_label
+      = link_to c[:category], show_books_by_category_path(c[:id]),method: :get,remote: true,class: "category_link"
