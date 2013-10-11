@@ -21,16 +21,23 @@ class BookDetail < ActiveRecord::Base
         value[:book_meta_data].each { |isbn_key,book_detail_value|
           book_detail_value.merge!({ site_id: isbn_key })
           book_details.book_metas.create(book_detail_value)
-          create_book_category(value[:category],book_details)
+          if !value[:category].nil?
+            create_category_details(value[:category],book_details)
+          end
         }
       end
     }
   end
 
-  def self.create_book_category(category_from_site,book_details)
-    category_from_site.each { |c|
-      category = BookCategory.where("category_name like '%#{c.gsub(/'s/,'')}%'")
-      book_details.book_categorys << category
+  def self.create_category_details(category_from_site,book_details)
+    category_from_site.each { |category|
+      c = category.gsub(/\&/,"").split
+      c.each{ |n|
+        category = BookCategory.where("category_name ilike '%#{n.gsub(/'s/,'')}%'")
+        if !category.nil?
+          book_details.book_categorys << category
+        end
+      }
     }
   end
 

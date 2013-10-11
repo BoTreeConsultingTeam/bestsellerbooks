@@ -60,6 +60,7 @@ module Utilities
         a.each_with_index { |a_item,index|
           category << a_item.text().squish.gsub(/\n/, '').strip
         }
+        category.delete_if {|x| x == "Books" || x == "Home" }
         begin
           rating = rating_div.attr('rating').text()
         rescue Exception => e

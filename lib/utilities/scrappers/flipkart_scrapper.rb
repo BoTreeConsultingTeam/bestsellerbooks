@@ -54,10 +54,9 @@ module Utilities
         rating = isbn_page.search('.ratings-section .pp-big-star').text()
         a = isbn_page.search('#fk-mainbody-id .fk-lbreadbcrumb span a')
         a.each_with_index { |a_item,index|
-          if a_item.text().strip != "Books" || a_item.text() != "Home"
-            category << a_item.text().squish.gsub(/\n/, '').strip
-          end
+          category << a_item.text().squish.gsub(/\n/, '').strip
         }
+        category.delete_if {|x| x == "Books" || x == "Home" }
         description = isbn_page.search('#description .item_desc_text p').to_s
         book_meta << details        
         book_meta << description
