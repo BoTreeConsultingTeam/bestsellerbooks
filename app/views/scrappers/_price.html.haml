@@ -35,8 +35,8 @@
                 = "Category :"
               %td
                 - if !@category_details.nil?
-                  - category = BookCategory.find(@category_details[:book_category_id])
-                  = link_to category[:category], show_books_by_category_path(category[:id]),method: :get,class: "book_category_link",remote: true
+                  - @category_details.each do |category_detail|
+                    = link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
             %tr
               %td
                 = "Average Rating :"

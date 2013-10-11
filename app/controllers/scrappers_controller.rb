@@ -1,12 +1,11 @@
 # require 'csv'
 
 class ScrappersController < ApplicationController
-  # autocomplete :book_detail, :title, :full => true, :scopes => [:scope1]
   def price_details
     @show_book_details = BookDetail.find_book_with_id(params[:format]).first
     @price_list = BookDetail.book_price(@show_book_details)
     @avg_rating = BookDetail.avg_rating(@show_book_details)
-    @category_details = CategoryDetail.find_by_book_detail_id(@show_book_details[:id])
+    @category_details = @show_book_details.book_categorys.uniq
   end
 
   def show
@@ -19,10 +18,7 @@ class ScrappersController < ApplicationController
   end
 
   def show_books_by_category
-    category_data = CategoryDetail.where(book_category_id: params[:format].to_i).first
-    if !category_data.nil?
-      @data = BookDetail.where(id: category_data[:book_detail_id]).order('title').page(params[:page]).per(12)
-    end
+    @data = BookCategory.find(params[:format].to_i).book_details.order('title').page(params[:page]).per(12).uniq
   end
 
   def refresh_details

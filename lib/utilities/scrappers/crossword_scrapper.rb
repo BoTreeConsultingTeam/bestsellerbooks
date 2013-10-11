@@ -9,7 +9,7 @@ module Utilities
       end
 
       def process_page
-        li = page.search('#content-slot ul li.clearfix')[1..10]
+        li = page.search('#content-slot ul li.clearfix')
         list = []
         site_id = Site.find_by_name("crossword")
         li.each_with_index { |li_item, index|
@@ -58,9 +58,7 @@ module Utilities
         rating_div = isbn_page.search('#catalog-details .avg-cust-rating span')
         a = isbn_page.search('#browse_nodes_bc li.clearfix a')
         a.each_with_index { |a_item,index|
-          if a_item.text() != "Books" || a_item.text() != "Home"
-            category << a_item.text().squish.gsub(/\n/, '').strip
-          end
+          category << a_item.text().squish.gsub(/\n/, '').strip
         }
         begin
           rating = rating_div.attr('rating').text()

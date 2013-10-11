@@ -8,7 +8,7 @@ module Utilities
         super(URL)
       end
       def process_page
-        li = page.search('#zg .zg_itemImmersion')[1..5]
+        li = page.search('#zg .zg_itemImmersion')
         site_id = Site.find_by_name("amazon")
         li.each_with_index{|li_item, index|
           title = li_item.search('.zg_itemWrapper .zg_title').text().squish.strip
@@ -51,9 +51,7 @@ module Utilities
         description = isbn_page.search('#outer_postBodyPS').to_s
         a = isbn_page.search('#SalesRank .zg_hrsr .zg_hrsr_ladder a')
         a.each_with_index { |a_item,index|
-          if a_item.text() != "Books" || a_item.text() != "Home"
-            category << a_item.text().squish.gsub(/\n/, '').strip
-          end
+          category << a_item.text().squish.gsub(/\n/, '').strip
         }
         meta << details
         meta << description

@@ -8,9 +8,9 @@ $(document).ready(function(){
   $("a.category_link").on("click",
     function(event) {
       $("a.category_link").css("font-weight","normal");
-      $("a.category_link").click(function(){return true;});
+      // $("a.category_link").click(function(){return true;});
       $(this).css("font-weight","bold");
-      $(this).click(function(){return false;});
+      // $(this).click(function(){return false;});
       $(".categor_label").text("Bestselling In" + " " + $(this).text() + " " + "Category" );
     });
 

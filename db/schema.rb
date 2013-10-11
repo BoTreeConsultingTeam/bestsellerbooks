@@ -11,12 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131010090152) do
+ActiveRecord::Schema.define(:version => 20131011044510) do
 
   create_table "book_categories", :force => true do |t|
-    t.text     "category"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.text     "category_name"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "book_details", :force => true do |t|

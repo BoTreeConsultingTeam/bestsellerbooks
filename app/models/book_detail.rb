@@ -1,7 +1,9 @@
 class BookDetail < ActiveRecord::Base
   attr_accessible :rating,:author, :images, :isbn, :title, :publisher,:language,:description
+  
+  has_many :category_details, dependent: :destroy
+  has_many :book_categorys, through: :category_details
   has_many :book_metas, dependent: :destroy
-  has_many :book_category, through: :category_detail
   
   scope :find_book_with_id, lambda { |book_details_id| where(id: book_details_id) }
   scope :find_book_with_isbn,  lambda { |book_details_isbn| where(isbn: book_details_isbn) }
@@ -19,20 +21,22 @@ class BookDetail < ActiveRecord::Base
         value[:book_meta_data].each { |isbn_key,book_detail_value|
           book_detail_value.merge!({ site_id: isbn_key })
           book_details.book_metas.create(book_detail_value)
-          category = BookCategory.where(category: value[:category])
-          category.each{ |c|
-            puts c[:id]
-            puts c[:category]
-            CategoryDetail.create(book_category_id: c[:id],book_detail_id: book_details[:id])
-          }
+          create_book_category(value[:category],book_details)
         }
       end
     }
   end
 
+  def self.create_book_category(category_from_site,book_details)
+    category_from_site.each { |c|
+      category = BookCategory.where("category_name like '%#{c.gsub(/'s/,'')}%'")
+      book_details.book_categorys << category
+    }
+  end
+
   def self.avg_rating(book)
     all_rating = book.book_metas.pluck(:rating)
-    all_rating.delete(nil)
+    all_rating = all_rating.compact
     if all_rating.count != 0
       avg_rating = (all_rating.sum) / all_rating.count
       avg_rating
@@ -81,9 +85,6 @@ class BookDetail < ActiveRecord::Base
       unique_books_details.each { |key,value|
         all_books.each { |k,v|
           if key == k
-            if unique_books_details[key][:category].nil? && !all_books[key][:category].nil?
-              unique_books_details[key][:category] = all_books[key][:category]
-            end
             if unique_books_details[key][:description].nil? && !all_books[key][:description].nil?
               unique_books_details[key][:description] = all_books[key][:description]
             end
@@ -112,7 +113,7 @@ class BookDetail < ActiveRecord::Base
 
   def self.select_category
     book_category = BookDetail.pluck(:category).uniq
-    book_category.compact
+    book_category = book_category.compact
     book_category
   end
 

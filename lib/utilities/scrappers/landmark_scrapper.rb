@@ -9,7 +9,7 @@ module Utilities
       end
 
       def process_page
-        li = page.search('#main-column section.productblock article.product')[1..10]
+        li = page.search('#main-column section.productblock article.product')
         list = []
         site_id = Site.find_by_name("landmarkonthenet")
         li.each_with_index { |li_item, index|
@@ -52,9 +52,7 @@ module Utilities
         a = isbn_page.search('#product-breadcrumbs li a')
         category= []
         a.each_with_index { |a_item,index|
-          if a_item.text() != "Books" || a_item.text() != "Home"
-            category << a_item.text().squish.gsub(/\n/, '').strip
-          end
+          category << a_item.text().squish.gsub(/\n/, '').strip
         }
         meta << details
         meta << category

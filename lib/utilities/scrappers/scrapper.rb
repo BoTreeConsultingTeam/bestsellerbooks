@@ -13,18 +13,15 @@ module Utilities
         @page = agent.get(url)
         @book_details = []
       end
+
       def initialize_isbn(url)
         agent = Mechanize.new
         @isbn_page = agent.get(url)
       end
+      
       def add_book_details(map)
         @book_details << map
       end
-      
-
-      #
-      # Public methods for creating new instance...
-      #
       
       def self.create_new_landmark_scrapper
         Utilities::Scrappers::LandmarkScrapper.new

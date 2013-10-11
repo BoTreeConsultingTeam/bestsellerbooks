@@ -9,7 +9,7 @@ module Utilities
       end
 
       def process_page
-        li = page.search('#staticpage .boxinnerbig ul li')[1..10]
+        li = page.search('#staticpage .boxinnerbig ul li')
         list = []
         site_id = Site.find_by_name("infibeam")
         li.each_with_index { |li_item, index|

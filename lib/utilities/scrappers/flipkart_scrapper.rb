@@ -1,16 +1,15 @@
 module Utilities
   module Scrappers
     class FlipkartScrapper < Scrapper
-  
+    
       URL = 'http://www.flipkart.com/view-books/l121/bestseller-literature-fiction'
-      # URL = 'http://www.flipkart.com/view-books/1/bestsellers?'
 
       def initialize
         super(URL)
       end
 
       def process_page
-        li = page.search('#search_results .fk-srch-item')[1..10]
+        li = page.search('#search_results .fk-srch-item')
         list = []
         site_id = Site.find_by_name("flipkart")
         li.each_with_index { |li_item, index|
