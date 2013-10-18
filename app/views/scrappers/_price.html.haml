@@ -1,85 +1,67 @@
-.row{style: "margin-left: -11px;"}
-  .span7
-    %table
-      %tr
-        %td{style: "width: 350px;"}
-          %table.table.table-striped
-            %tr
-              %th{colspan: "2"}
-                = @show_book_details[:title]
-            %tr
-              %td{colspan: "2",valign: "center"}
-                = image_tag("#{@show_book_details[:images]}")
-            %tr
-              %td{style: "width: 85px;"}
-                = "Author :"
-              %td
-                = @show_book_details[:author]
-            %tr
-              %td
-                = "ISBN :"
-              %td
-                = @show_book_details[:isbn]
-            %tr
-              %td
-                = "Publisher :"
-              %td
-                = @show_book_details[:publisher]
-            %tr
-              %td
-                = "Language :"
-              %td
-                = @show_book_details[:language]
-            %tr
-              %td
-                = "Category :"
-              %td
-                - if !@category_details.nil?
-                  - @category_details.each do |category_detail|
-                    = link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
-            %tr
-              %td
-                = "Average Rating :"
-              %td
-                = hidden_field_tag 'avg_rating', @avg_rating
-                #star
-        %td{width: "100px"}
-        %td{valign: "top",style: "width: 270px;"}
-          %table.table.table-striped
-            %tr
-              %td
-                = "Site"
-              %td
-                = "Price"
-              %td
-                = "Discount"
-              %td
-                = "Rating"
-            - index = 0
-            - @price_list.each do |price|
-              %tr
-                %td
-                  - s = Site.site_name(price[:site_id]).first
-                  = s[:name]
-                %td
-                  - if !price[:price].nil?
-                    = link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
-                  - else
-                    = "-"
-                %td
-                  - if !price[:discount].nil?
-                    = link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
-                    \%
-                  - else
-                    = "-"
-                %td
-                  - if !price[:rating].nil?
-                    = hidden_field_tag "rating_#{index}", price[:rating]
-                    .separate_star_rating{id: "star_#{index}"}
-                    - index = index + 1
-                  - else
-                    = "-"
-
-    - if !@show_book_details[:description].nil?
-      .description_div
-        = @show_book_details[:description].html_safe
+.span7
+	.span2{style: "margin-top: 25px;"}
+		= image_tag("#{@show_book_details[:images]}",style: "width: 100px; height: 150px;")
+		#star
+	.span4{style: "font-size: 13px;"}
+		%dl.dl-horizontal
+			%h5
+				= @show_book_details[:title]
+			#star
+			%dt{style: "text-align: left;"} By :
+			%dd
+				= hidden_field_tag 'avg_rating', @avg_rating
+			%dd 
+				=@show_book_details[:author]
+			%dt{style: "text-align: left;"} ISBN :
+			%dd 
+				= @show_book_details[:isbn]
+			%dt{style: "text-align: left;"} Publisher :
+			%dd
+				= @show_book_details[:publisher]
+			%dt{style: "text-align: left;"} Language :
+			%dd
+				= @show_book_details[:language]
+			- if !@category_details.nil?
+				%dt{style: "text-align: left;"} Category :
+				%dd			
+					- @category_details.each do |category_detail|
+						= link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
+						\|
+.span5{style: "margin-left: 60px; margin-top: 21px;"}
+	%table.table.table-striped
+		%tr
+			%td
+				= "Site"
+			%td
+				= "Price"
+			%td
+				= "Discount"
+			%td
+				= "Rating"
+		- index = 0
+		- @price_list.each do |price|
+			%tr
+				%td
+					- s = Site.site_name(price[:site_id]).first
+					= link_to s[:name], "#{price[:book_detail_url] }",target: "_blank"
+				%td
+					- if !price[:price].nil?
+						= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
+					- else
+						= "-"
+				%td
+					- if !price[:discount].nil?
+						= link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
+						\%
+					- else
+						= "-"
+				%td
+					- if !price[:rating].nil?
+						= hidden_field_tag "rating_#{index}", price[:rating]
+						.separate_star_rating{id: "star_#{index}"}
+						- index = index + 1
+					- else
+						= "-"
+.span7
+	- if !@show_book_details[:description].nil?
+		= @show_book_details[:description].html_safe

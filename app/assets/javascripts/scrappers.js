@@ -16,7 +16,8 @@ $(document).ready(function(){
 
   $("#search").focus(function(){
     $(this).autocomplete({
-      source: search_data
+      source: search_data,
+      minLength: 3
     });
   });
 });

@@ -1,5 +1,5 @@
 $('#dialog').html('<%= escape_javascript(render :partial => 'price') %>');
-$('#dialog').dialog({ height: 500,width: 800, modal: true });
+$('#dialog').dialog({ height: 505,width: 751, modal: true });
 
 var avg_rating = $("#avg_rating").attr('value');
 $('#star').raty({ readOnly: true,score: avg_rating,number: 5 });
