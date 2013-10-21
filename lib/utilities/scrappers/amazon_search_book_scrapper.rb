@@ -8,9 +8,17 @@ module Utilities
 
       def process_page
         unless page.nil?
-          href_url = page.search('#atfResults a').attr('href').text()
-          meta = AmazonScrapper.process_isbn_page(href_url)
-          add_book_details(meta)
+          begin
+            href_url = page.search('#atfResults a').attr('href').text()
+          rescue Exception => e
+            href_url = nil
+          end
+          sub_page = page_instance(href_url)
+          unless sub_page.nil?
+          meta = AmazonScrapper.process_book_data_page(sub_page)
+            meta.merge!("book_detail_url".to_sym => href_url)
+            add_book_details(meta)            
+          end
         end
       end
     end

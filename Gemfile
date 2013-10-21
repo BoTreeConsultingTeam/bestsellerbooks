@@ -12,7 +12,9 @@ gem 'nokogiri'
 gem 'therubyracer', :platform => :ruby
 gem "haml"
 gem "haml-rails"
+# gem "rsruby", "0.5.1.1"
 gem "pg"
+# gem "better-benchmark", "0.8.6"
 # gem 'jquery-star-rating-rails'
 gem "jquery-raty-rails"
 # Gems used only for assets and not required

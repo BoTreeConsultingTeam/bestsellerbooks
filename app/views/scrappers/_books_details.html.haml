@@ -12,7 +12,7 @@
               %li.span3.text-center
                 .thumbnail{style: "height: 300px; padding-top: 7px;",class: "thumbnail_book"}
                   %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
-                    %img{:alt => "", :src => "#{item[:images]}", style: "width: 90px; height: 140px;"}
+                    %img{:alt => "", :src => "#{item[:images]}", style: "height: 140px;"}
                   %p
                     %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
                       =item[:title]

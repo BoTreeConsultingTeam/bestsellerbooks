@@ -1,6 +1,7 @@
 class BookDetail < ActiveRecord::Base
   attr_accessible :rating,:author, :images, :isbn, :title, :publisher,:language,:description
-  
+  validates :isbn, presence: true
+
   has_many :category_details, dependent: :destroy
   has_many :book_categorys, through: :category_details
   has_many :book_metas, dependent: :destroy
@@ -18,81 +19,73 @@ class BookDetail < ActiveRecord::Base
       unless book_details.persisted?
         site_id = []
         book_details.save
+        book_meta_data = []
         value[:book_meta_data].each do |site_key, book_detail_value|
           site_id << site_key.to_i
           book_detail_value.merge!(site_id: site_key)
-          book_details.book_metas.create(book_detail_value)
+          book_meta_data << book_detail_value
           create_category_details(value[:category], book_details) if !value[:category].nil?
         end
         isbn = book_details[:isbn]
         book_data = find_book_meta(book_details, isbn, site_id)
-        unless book_data.nil?
-          create_book_meta(book_details, book_data)
-        end
+        book_all_meta_data = book_meta_data + book_data
+        create_book_meta(book_details, book_all_meta_data)
       end
     end
   end
 
   def self.create_book_meta(book_details, book_data)
-      book_details.book_metas.create!(book_data)
+    puts book_data.class
+      book_data.each do |meta|
+        puts meta
+        puts meta.class
+        book_details.book_metas.create(site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
+      end
   end
   
   def self.find_book_meta(book_details, isbn, site_id)
     all_site = Site.pluck(:id)
     remain_site = all_site - site_id
     site = Site.where(id: remain_site)
-    # book_data = {}
     book_data = []
     site.each do |s|
       if s[:name] == "crossword"
         url = "http://www.crossword.in/books/search?q=" + isbn
-        crossword = Utilities::Scrappers::Scrapper.create_new_crossword_scrapper(url)
-        crossword.process_page
-        crossword_data = crossword.book_details
-        data = crossword_data[0]
-        puts data
-        puts isbn
-        if !data.nil? && data.key?(isbn)
-          meta = data[isbn.to_s][:book_meta_data][s[:id].to_s]
-          meta.merge!("site_id" => s[:id])
-          # book_data.merge!(s[:id] => meta)
-          book_data << meta
-        end
+        crossword = Utilities::Scrappers::Scrapper.create_new_crossword_search_book_scrapper(url)
+        book_data = BookDetail.process_search_book_data(crossword, isbn, s[:id], book_data, url)
       elsif s[:name] == "flipkart"
         url = "http://www.flipkart.com/search?q=" + isbn
-        flipkart_data = Utilities::Scrappers::FlipkartScrapper.process_isbn_page(url)
-        puts flipkart_data
-        puts isbn
-        if !flipkart_data.empty? && !flipkart_data[:price].nil? && flipkart_data[:isbn] == isbn.to_s
-          # book_data.merge!(s[:id] => { discount: flipkart_data[:discount], site_id: s[:id], price: flipkart_data[:price], rating: flipkart_data[:rating], book_detail_url: url })
-          book_data << { discount: flipkart_data[:discount], site_id: s[:id], price: flipkart_data[:price], rating: flipkart_data[:rating], book_detail_url: url }
-        end
+        flipkart = Utilities::Scrappers::FlipkartScrapper.create_new_flipkart_search_book_scrapper(url)
+        book_data = BookDetail.process_search_book_data(flipkart, isbn, s[:id], book_data, url)
       elsif s[:name] == "amazon" 
         url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
         amazon = Utilities::Scrappers::Scrapper.create_new_amazon_search_book_scrapper(url)
-        unless amazon.nil?
-          amazon.process_page
-          amazon_data = amazon.book_details
-          data = amazon_data[0]
-          puts data
-          puts isbn
-          if data[:isbn] == isbn && !data[:price].nil?
-            # book_data.merge!(s[:id] => { discount: data[:discount], site_id: s[:id], price: data[:price], rating: data[:rating], book_detail_url: data[:url] })
-            book_data << { discount: data[:discount], site_id: s[:id], price: data[:price], rating: data[:rating], book_detail_url: data[:url] }
-          end
-        end
+        book_data = BookDetail.process_search_book_data(amazon, isbn, s[:id], book_data, url)
       elsif s[:name] == "landmarkonthenet"
         url = "http://www.landmarkonthenet.com/search/?q=" + isbn
-        landmarkonthenet_data = Utilities::Scrappers::LandmarkScrapper.process_isbn_page(url)
-        puts landmarkonthenet_data
-        puts isbn
-        if !landmarkonthenet_data.empty? && !landmarkonthenet_data[:price].nil? && landmarkonthenet_data[:isbn] == isbn.to_s
-          # book_data.merge!(s[:id] => { site_id: s[:id], discount: landmarkonthenet_data[:discount], price: landmarkonthenet_data[:price], book_detail_url: url })
-          book_data << { site_id: s[:id], discount: landmarkonthenet_data[:discount], price: landmarkonthenet_data[:price], book_detail_url: url }
-        end
+        landmarkonthenet = Utilities::Scrappers::LandmarkScrapper.create_new_landmark_search_book_scrapper(url)
+        book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, s[:id], book_data, url)
       end
     end
     book_data
+  end
+
+  def self.process_search_book_data(site_data, isbn, site_id, all_book_data, url)
+    puts site_data
+    unless site_data.nil?
+      site_data.process_page
+      book_data = site_data.book_details
+      book_data.each do |book_detail|
+        if book_detail[:book_detail_url].nil?
+          book_detail[:book_detail_url] = url
+        end
+        if !book_detail.empty? && !book_detail[:price].nil? && book_detail[:isbn] == isbn
+          book_detail.merge!("site_id".to_sym => site_id)
+          all_book_data << book_detail
+        end
+      end
+    end
+    all_book_data
   end
 
   def self.create_category_details(category_from_site, book_details)
@@ -133,7 +126,7 @@ class BookDetail < ActiveRecord::Base
             meta.merge!(site_id: site_id_key)
             book_details.book_metas.create(meta)
           else
-            old_price_list.update_attributes(price: meta[:price], discount: meta[:discount])
+            old_price_list.update_attributes(price: meta[:price], discount: meta[:discount], rating: meta[:rating])
             # site_having_book.delete(id.to_i)
           end
         end

@@ -25,24 +25,19 @@ class ScrappersController < ApplicationController
     unique_books_details = {}
 
     @flipkart = Utilities::Scrappers::Scrapper.create_new_flipkart_scrapper
-    unique_books_details = process_page(@flipkart, unique_books_details)
-    
+    unique_books_details = @flipkart.crawl(unique_books_details)
+      
     @landmark = Utilities::Scrappers::Scrapper.create_new_landmark_scrapper
-    unique_books_details = process_page(@landmark, unique_books_details)
+    unique_books_details = @landmark.crawl(@landmark, unique_books_details)
 
-    @crossword = Utilities::Scrappers::Scrapper.create_new_crossword_scrapper("http://www.crossword.in/see_more_pages/books-best-sellers-seemore-data")
-    unique_books_details = process_page(@crossword, unique_books_details)
+    @crossword = Utilities::Scrappers::Scrapper.create_new_crossword_scrapper
+    unique_books_details = @crossword.crawl(@crossword, unique_books_details)
 
     @amazon = Utilities::Scrappers::Scrapper.create_new_amazon_scrapper
-    unique_books_details = process_page(@amazon, unique_books_details)
+    unique_books_details = @amazon.crawl(@amazon, unique_books_details)
     
     BookDetail.create_or_find_book_details!(unique_books_details)
     redirect_to root_path
-  end
-
-  def process_page(site, unique_books_details)
-    site.process_page
-    unique_books_details = BookDetail.filter_books!(site.book_details, unique_books_details)
   end
 
   def show_latest_books

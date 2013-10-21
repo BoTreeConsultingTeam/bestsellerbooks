@@ -1,28 +1,28 @@
 .span7
 	.span2{style: "margin-top: 25px;"}
-		= image_tag("#{@show_book_details[:images]}",style: "width: 100px; height: 150px;")
+		= image_tag("#{@show_book_details[:images]}",style: "height: 150px;")
 		#star
 	.span4{style: "font-size: 13px;"}
 		%dl.dl-horizontal
 			%h5
 				= @show_book_details[:title]
 			#star
-			%dt{style: "text-align: left;"} By :
+			%dt{style: "text-align: left; width: 100px;"} By :
 			%dd
 				= hidden_field_tag 'avg_rating', @avg_rating
 			%dd 
 				=@show_book_details[:author]
-			%dt{style: "text-align: left;"} ISBN :
+			%dt{style: "text-align: left; width: 100px;"} ISBN :
 			%dd 
 				= @show_book_details[:isbn]
-			%dt{style: "text-align: left;"} Publisher :
+			%dt{style: "text-align: left; width: 100px;"} Publisher :
 			%dd
 				= @show_book_details[:publisher]
-			%dt{style: "text-align: left;"} Language :
+			%dt{style: "text-align: left; width: 100px;"} Language :
 			%dd
 				= @show_book_details[:language]
 			- if !@category_details.nil?
-				%dt{style: "text-align: left;"} Category :
+				%dt{style: "text-align: left; width: 100px;"} Category :
 				%dd			
 					- @category_details.each do |category_detail|
 						= link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
