@@ -42,6 +42,7 @@ class BookDetail < ActiveRecord::Base
     remain_site = Site::ALL_SITE_IDS - existing_site_ids
     book_data = []
     Site.where(id: remain_site).each do |site|
+      logger.debug "Processing #{site[:name]} for prices....."
       if site[:name] == "crossword"
         url = "http://www.crossword.in/books/search?q=" + isbn
         crossword = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:crossword, url)
@@ -60,6 +61,7 @@ class BookDetail < ActiveRecord::Base
         book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
       end
     end
+    logger.debug "#{book_data}"
     self.create_book_meta(book_details, book_data)
   end
 
