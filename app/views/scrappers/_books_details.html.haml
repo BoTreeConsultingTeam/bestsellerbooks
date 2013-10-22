@@ -3,7 +3,7 @@
     - if !@data.nil?
       = paginate @data, :params => {:action => paginate_action}, remote: true
   .span10
-    = link_to "refresh", refresh_details_path
+    -#= link_to "refresh", refresh_details_path
     - if !@data.nil?
       - @data.each_slice(4).to_a.each do |row|
         .row-fluid
@@ -17,7 +17,7 @@
                     %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                       = label_tag item[:title], nil, class: 'bold', style: "font-size: 16px" 
                   %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true, style: "font-size: 12px"}
+                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                       %strong By:
                       =item[:author]
                   %p

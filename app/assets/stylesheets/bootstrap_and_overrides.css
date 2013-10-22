@@ -7,8 +7,10 @@
   */
 
 .thumbnail {
-    height: 270px; padding-top: 7px;
+    height: 255px; padding-top: 7px;
 }
+.thumbnail p {text-align: left}
+.thumbnails p {font-size: 12px}
 .table {
     margin-bottom: 0;
 }
