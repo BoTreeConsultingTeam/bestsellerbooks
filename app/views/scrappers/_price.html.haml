@@ -6,14 +6,13 @@
 		%dl.dl-horizontal
 			%h5
 				= @show_book_details[:title]
-			#star
 			%dt{style: "text-align: left; width: 100px;"} By :
 			%dd
 				= hidden_field_tag 'avg_rating', @avg_rating
 			%dd 
 				=@show_book_details[:author]
 			%dt{style: "text-align: left; width: 100px;"} ISBN :
-			%dd 
+			%dd#book_isbn
 				= @show_book_details[:isbn]
 			%dt{style: "text-align: left; width: 100px;"} Publisher :
 			%dd
@@ -28,7 +27,7 @@
 						= link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
 						\|
 .span5{style: "margin-left: 60px; margin-top: 21px;"}
-	%table.table.table-striped
+	%table.table.table-striped{style: "margin-bottom: 0px;"}
 		%tr
 			%td
 				= "Site"
@@ -41,15 +40,15 @@
 		- index = 0
 		- @price_list.each do |price|
 			%tr
-				%td
+				%td{style: "width: 139px;"}
 					- s = Site.site_name(price[:site_id]).first
 					= link_to s[:name], "#{price[:book_detail_url] }",target: "_blank"
-				%td
+				%td{style: "width: 50px;"}
 					- if !price[:price].nil?
 						= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
 					- else
 						= "-"
-				%td
+				%td{style: "width: 83px;"}
 					- if !price[:discount].nil?
 						= link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
 						\%
@@ -62,6 +61,8 @@
 						- index = index + 1
 					- else
 						= "-"
+	#books_price
+	.ajax-progress-1
 .span7
 	- if !@show_book_details[:description].nil?
 		= @show_book_details[:description].html_safe

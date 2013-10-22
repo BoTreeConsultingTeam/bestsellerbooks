@@ -27,9 +27,9 @@ class BookDetail < ActiveRecord::Base
           create_category_details(value[:category], book_details) if !value[:category].nil?
         end
         isbn = book_details[:isbn]
-        book_data = find_book_meta(book_details, isbn, site_id)
-        book_all_meta_data = book_meta_data + book_data
-        create_book_meta(book_details, book_all_meta_data)
+        # book_data = find_book_meta(book_details, isbn, site_id)
+        # book_all_meta_data = book_meta_data + book_data
+        create_book_meta(book_details, book_meta_data)
       end
     end
   end
@@ -37,8 +37,6 @@ class BookDetail < ActiveRecord::Base
   def self.create_book_meta(book_details, book_data)
     puts book_data.class
       book_data.each do |meta|
-        puts meta
-        puts meta.class
         book_details.book_metas.create(site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
       end
   end
@@ -67,7 +65,8 @@ class BookDetail < ActiveRecord::Base
         book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, s[:id], book_data, url)
       end
     end
-    book_data
+    puts book_data
+    BookDetail.create_book_meta(book_details, book_data)
   end
 
   def self.process_search_book_data(site_data, isbn, site_id, all_book_data, url)
@@ -127,26 +126,13 @@ class BookDetail < ActiveRecord::Base
             book_details.book_metas.create(meta)
           else
             old_price_list.update_attributes(price: meta[:price], discount: meta[:discount], rating: meta[:rating])
-            # site_having_book.delete(id.to_i)
           end
         end
-        # book_data = find_book_meta(book_details, isbn, site_id)
-        # update_book_meta(book_details, book_data)
-        # site_having_book.each { |site_id| book_details.book_metas.site_id(site_id).first.destroy }
-        # unless fresh_list_of_books_details[key][:category].nil?
-        #   create_category_details(fresh_list_of_books_details[key][:category], book_details)
-        # end
       else
         BookDetail.find_book_with_isbn(isbn_key).first.destroy
       end
     end
   end
-
-  # def update_book_meta(book_details, book_data)
-    # book_data.each do |data|
-    # book_meta_data = book_details.book_meta.where(site_id: data[:site_id])
-    # book_meta_data.update_attributes(price: book_data[:price], rating: book_data[:rating], )
-  # end
 
   def self.filter_books!(books_details, unique_books_details)
     book_hash = {}

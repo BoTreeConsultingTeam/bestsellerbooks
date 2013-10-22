@@ -1,0 +1,9 @@
+$('#books_price').html('<%= escape_javascript(render :partial => 'show_price', :locals => {new_price_list: @new_price_list}) %>');
+var avg_rating = $("#new_avg_rating").attr('value');
+$('#star').raty({ readOnly: true,score: avg_rating,number: 5 });
+$('#none_star').raty({ readOnly: true,score: 0,number: 5 });
+var length = $("div[class*='new_separate_star_rating']").length;
+for ( var i = 0; i < length; i++ ){
+	var rating = $("#new_rating_" + i).attr('value');
+	$("#new_star_" + i).raty({ readOnly: true, score: rating, number: 5 });
+}

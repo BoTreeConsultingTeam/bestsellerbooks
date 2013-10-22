@@ -14,3 +14,17 @@ div.ajax-progress {
   -webkit-border-radius: 10px;
   border-radius:         10px;
 }
+div.ajax-progress-1 {
+  display: none;
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  left: 50%;
+  background-image: url('ajax-loader-1.gif');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: white;
+  -moz-border-radius:    10px;
+  -webkit-border-radius: 10px;
+  border-radius:         10px;
+}

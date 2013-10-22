@@ -1,6 +1,14 @@
 $('#dialog').html('<%= escape_javascript(render :partial => 'price') %>');
 $('#dialog').dialog({ height: 505,width: 751, modal: true });
 
+$(document).ready(function(){
+	$(".ajax-progress-1").show();
+	var data = $('#book_isbn').text();
+	$.get( "scrappers/find_book_price", {isbn: data})
+	.done(function( data ) {
+		$(".ajax-progress-1").hide();
+  });
+});
 var avg_rating = $("#avg_rating").attr('value');
 $('#star').raty({ readOnly: true,score: avg_rating,number: 5 });
 $('#none_star').raty({ readOnly: true,score: 0,number: 5 });

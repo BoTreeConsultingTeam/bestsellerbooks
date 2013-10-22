@@ -1,0 +1,28 @@
+#price_list.span5{style: "margin-left: 0px;"}
+	%table.table.table-striped
+		- index = 0
+		-unless new_price_list.nil?
+			= hidden_field_tag 'new_avg_rating', @new_avg_rating
+			- new_price_list.each do |price|
+				%tr
+					%td{style: "width: 139px;"}
+						- s = Site.site_name(price[:site_id]).first
+						= link_to s[:name], "#{price[:book_detail_url] }",target: "_blank"
+					%td{style: "width: 50px;"}
+						- if !price[:price].nil?
+							= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
+						- else
+							= "-"
+					%td{style: "width: 83px;"}
+						- if !price[:discount].nil?
+							= link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
+							\%
+						- else
+							= "-"
+					%td
+						- if !price[:rating].nil?
+							= hidden_field_tag "new_rating_#{index}", price[:rating]
+							.new_separate_star_rating{id: "new_star_#{index}"}
+							- index = index + 1
+						- else
+							= "-"

@@ -15,7 +15,6 @@ module Utilities
           site_id = Site.find_by_name("flipkart")
           li.each_with_index do |li_item, index|
             title = li_item.search('.fk-sitem-image-section a img').attr('title').text().squish.strip
-            # price = li_item.search('.fk-sitem-info-section .final-price').text().gsub(/\D/,'').squish.strip
             discount =  li_item.search('.fk-sitem-info-section .fk-font-small').text().gsub(/\D/,'')
             img_url = li_item.search('.fk-sitem-image-section .rposition a img').attr('data-src').text()
             href_url = 'http://www.flipkart.com' + li_item.search('.fk-sitem-image-section a').attr('href').text()

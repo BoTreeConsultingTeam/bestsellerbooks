@@ -10,21 +10,24 @@
           %ul.thumbnails
             -row.each do |item|
               %li.span3.text-center
+                / = hidden_field_tag 'book_isbn', item[:isbn]
                 .thumbnail{style: "height: 300px; padding-top: 7px;",class: "thumbnail_book"}
-                  %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                  %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
                     %img{:alt => "", :src => "#{item[:images]}", style: "height: 140px;"}
                   %p
-                    %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                    %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
                       =item[:title]
                   %p
-                    %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                    %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
                       %strong By:
                       =item[:author]
                   %p
-                    %a{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                    %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
                       %strong Best Buy Price:
                       - min_price = BookDetail.book_price(item).first
                       = min_price[:price]
+
+
     - else
       %p
         %p

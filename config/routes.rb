@@ -6,6 +6,7 @@ Bestsellerbooks::Application.routes.draw do
   get 'scrappers/refresh_details', to: 'scrappers#refresh_details', as: 'refresh_details'
   get "scrappers/show", to: "scrappers#show", as: "show"
   get "scrappers/show_books_by_category", as: "show_books_by_category"
+  get "scrappers/find_book_price"
   # resources 'scrappers' do
   #  get :autocomplete_book_detail_title, :on => :collection
   # end
