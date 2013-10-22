@@ -6,3 +6,8 @@
       = form_tag show_path, method: :get,remote: true,class: "navbar-search pull-center",style: "padding-right: 0px; border-right-width: 0px; margin-right: 0px; right: -163px;" do
         = text_field_tag :search, nil,  class: "search-query", placeholder: "Search within #{website}",style: "width: 400px;"
         = submit_tag "search", class: "btn btn-success",id: 'search-ajax', style: "margin-top: 0px;"
+      %ul.nav.pull-right
+        %li
+          %a{href: "http://www.botreeconsulting.com"}
+            Powered by
+            %strong BoTree Consulting

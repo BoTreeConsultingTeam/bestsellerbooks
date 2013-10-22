@@ -12,6 +12,10 @@
 <body>
 <div id="main_div">
 <%= render partial: "layouts/navigation" %>
+  <div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Heads up!</strong> We collect bestseller books and compare prices from amazon.in, flipkart.com, landmarkonthenet.com and crossword.in
+  </div>
 <%= yield %>
 
 <div id="dialog" title="Books details"></div>
