@@ -22,32 +22,16 @@ class ScrappersController < ApplicationController
   end
 
   def refresh_details
-    unique_books_details = {}
-
-    @amazon = Utilities::Scrappers::Scrapper.create_new_amazon_scrapper
-    unique_books_details = @amazon.crawl(unique_books_details)
-
-    @flipkart = Utilities::Scrappers::Scrapper.create_new_flipkart_scrapper
-    unique_books_details = @flipkart.crawl(unique_books_details)
-      
-    @landmark = Utilities::Scrappers::Scrapper.create_new_landmark_scrapper
-    unique_books_details = @landmark.crawl(unique_books_details)
-
-    @crossword = Utilities::Scrappers::Scrapper.create_new_crossword_scrapper
-    unique_books_details = @crossword.crawl(unique_books_details)
-    
-    BookDetail.create_or_find_book_details!(unique_books_details)
+    BookDetail.create_or_find_book_details!(Utilities::Scrappers::collect)
     redirect_to root_path
   end
 
   def find_book_price
     book_details = BookDetail.find_by_isbn("#{params[:isbn].squish}")
-    all_site = Site.pluck(:id)
-    sites_id = book_details.book_metas.pluck(:site_id)
+    sites_ids = book_details.book_metas.pluck(:site_id)
     
-    BookDetail.find_book_meta(book_details, "#{params[:isbn].squish}", sites_id)
-    new_meta_data = all_site - sites_id
-    @new_price_list = book_details.book_metas.where(site_id: new_meta_data)
+    BookDetail.find_book_meta(book_details, "#{params[:isbn].squish}", sites_ids)
+    @new_price_list = book_details.book_metas.where(site_id: (Site::ALL_SITE_IDS - sites_ids))
     @new_avg_rating = BookDetail.avg_rating(book_details)
   end
 

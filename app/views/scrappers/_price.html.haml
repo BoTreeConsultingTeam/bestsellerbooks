@@ -39,6 +39,7 @@
 				= "Rating"
 		- index = 0
 		- @price_list.each do |price|
+		- logger.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#{price}"
 			%tr
 				%td{style: "width: 139px;"}
 					- s = Site.site_name(price[:site_id]).first

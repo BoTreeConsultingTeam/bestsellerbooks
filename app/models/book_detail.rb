@@ -35,37 +35,33 @@ class BookDetail < ActiveRecord::Base
   end
 
   def self.create_book_meta(book_details, book_data)
-    puts book_data.class
-      book_data.each do |meta|
-        book_details.book_metas.create(site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
-      end
+    book_data.each do |meta|
+      book_details.book_metas.create(site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
+    end
   end
   
-  def self.find_book_meta(book_details, isbn, site_id)
-    all_site = Site.pluck(:id)
-    remain_site = all_site - site_id
-    site = Site.where(id: remain_site)
+  def self.find_book_meta(book_details, isbn, existing_site_ids)
+    remain_site = Site::ALL_SITE_IDS - existing_site_ids
     book_data = []
-    site.each do |s|
-      if s[:name] == "crossword"
+    Site.where(id: remain_site).each do |site|
+      if site[:name] == "crossword"
         url = "http://www.crossword.in/books/search?q=" + isbn
-        crossword = Utilities::Scrappers::Scrapper.create_new_crossword_search_book_scrapper(url)
-        book_data = BookDetail.process_search_book_data(crossword, isbn, s[:id], book_data, url)
-      elsif s[:name] == "flipkart"
+        crossword = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:crossword, url)
+        book_data = BookDetail.process_search_book_data(crossword, isbn, site[:id], book_data, url)
+      elsif site[:name] == "flipkart"
         url = "http://www.flipkart.com/search?q=" + isbn
-        flipkart = Utilities::Scrappers::FlipkartScrapper.create_new_flipkart_search_book_scrapper(url)
-        book_data = BookDetail.process_search_book_data(flipkart, isbn, s[:id], book_data, url)
-      elsif s[:name] == "amazon" 
-        url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
-        amazon = Utilities::Scrappers::Scrapper.create_new_amazon_search_book_scrapper(url)
-        book_data = BookDetail.process_search_book_data(amazon, isbn, s[:id], book_data, url)
-      elsif s[:name] == "landmarkonthenet"
+        flipkart = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:flipkart, url)
+        book_data = BookDetail.process_search_book_data(flipkart, isbn, site[:id], book_data, url)
+      elsif site[:name] == "amazon"
+        url = "http://www.amazon.in/site/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
+        amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
+        book_data = BookDetail.process_search_book_data(amazon, isbn, site[:id], book_data, url)
+      elsif site[:name] == "landmarkonthenet"
         url = "http://www.landmarkonthenet.com/search/?q=" + isbn
-        landmarkonthenet = Utilities::Scrappers::LandmarkScrapper.create_new_landmark_search_book_scrapper(url)
-        book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, s[:id], book_data, url)
+        landmarkonthenet = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:landmark, url)
+        book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
       end
     end
-    puts book_data
     BookDetail.create_book_meta(book_details, book_data)
   end
 

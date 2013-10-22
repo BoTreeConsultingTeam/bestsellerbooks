@@ -31,38 +31,6 @@ module Utilities
       def add_book_details(map)
         @book_details << map
       end
-      
-      def self.create_new_landmark_scrapper
-        Utilities::Scrappers::LandmarkScrapper.new
-      end
-
-      def self.create_new_landmark_search_book_scrapper(site_url)
-        Utilities::Scrappers::LandmarkSearchBookScrapper.new(site_url)
-      end
-
-      def self.create_new_flipkart_scrapper
-        Utilities::Scrappers::FlipkartScrapper.new
-      end
-
-      def self.create_new_flipkart_search_book_scrapper(site_url)
-        Utilities::Scrappers::FlipkartSearchBookScrapper.new(site_url)
-      end
-
-      def self.create_new_crossword_scrapper
-        Utilities::Scrappers::CrosswordScrapper.new
-      end
-
-      def self.create_new_crossword_search_book_scrapper(site_url)
-        Utilities::Scrappers::CrosswordSearchBookScrapper.new(site_url)
-      end
-
-      def self.create_new_amazon_scrapper
-        Utilities::Scrappers::AmazonScrapper.new
-      end
-
-      def self.create_new_amazon_search_book_scrapper(site_url)
-        Utilities::Scrappers::AmazonSearchBookScrapper.new(site_url)
-      end
 
       def crawl(unique_books_details)
         self.process_page
@@ -70,6 +38,47 @@ module Utilities
         unique_books_details
       end
 
+      def self.get_main_page_scrapper(scrapper)
+        case scrapper
+          when :amazon
+            Utilities::Scrappers::AmazonScrapper.new
+          when :flipkart
+            Utilities::Scrappers::FlipkartScrapper.new
+          when :landmark
+            Utilities::Scrappers::LandmarkScrapper.new
+          when :crossword
+            Utilities::Scrappers::CrosswordScrapper.new
+        end
+      end
+
+      def self.get_search_page_scrapper(scrapper, site_url='')
+        case scrapper
+          when :amazon
+            Utilities::Scrappers::AmazonSearchBookScrapper.new(site_url)
+          when :flipkart
+            Utilities::Scrappers::FlipkartSearchBookScrapper.new(site_url)
+          when :landmark
+            Utilities::Scrappers::LandmarkSearchBookScrapper.new(site_url)
+          when :crossword
+            Utilities::Scrappers::CrosswordSearchBookScrapper.new(site_url)
+        end
+      end
+
+      def self.collect
+        unique_books_details = {}
+
+        amazon = get_main_page_scrapper(:amazon)
+        unique_books_details = amazon.crawl(unique_books_details)
+
+        flipkart = get_main_page_scrapper(:flipkart)
+        unique_books_details = flipkart.crawl(unique_books_details)
+
+        landmark = get_main_page_scrapper(:landmark)
+        unique_books_details = landmark.crawl(unique_books_details)
+
+        crossword = get_main_page_scrapper(:crossword)
+        unique_books_details = crossword.crawl(unique_books_details)
+      end
     end
 
   end
