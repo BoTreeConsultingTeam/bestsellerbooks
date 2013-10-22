@@ -9,3 +9,6 @@
 .thumbnail {
     height: 270px; padding-top: 7px;
 }
+.table {
+    margin-bottom: 0;
+}

@@ -13,8 +13,9 @@ $(document).ready(function(){
 	$('#star').raty({ readOnly: true,score: avg_rating,number: 5 });
 	$('#none_star').raty({ readOnly: true,score: 0,number: 5 });
 	var length = $("div[class*='separate_star_rating']").length;
+	var length = $("div[class*='new_separate_star_rating']").length;
 	for ( var i = 0; i < length; i++ ){
-		var rating = $("#rating_" + i).attr('value');
-		$("#star_" + i).raty({ readOnly: true, score: rating, number: 5 });
+		var rating = $("#new_rating_" + i).attr('value');
+		$("#new_star_" + i).raty({ readOnly: true, score: rating, number: 5 });
 	}
 });

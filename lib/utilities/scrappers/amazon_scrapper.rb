@@ -30,7 +30,7 @@ module Utilities
                 description: meta[:description],
                 category: meta[:category],            
                 book_meta_data: { "#{site_id[:id]}" => { rating: rating, price: meta[:price],
-                 discount: meta[:discount], book_detail_url: meta[:url] }}
+                 discount: meta[:discount], book_detail_url: href_url }}
               }}          
               add_book_details(li_map)
             end
@@ -57,7 +57,6 @@ module Utilities
           a.each_with_index { |a_item, index|
             category << a_item.text().squish.gsub(/\n/, '').strip
           }
-          details.merge!("url".to_s => href_url)
           category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
           details.merge!("category".to_sym => category)
           book_data = AmazonScrapper.process_book_data_page(sub_page)
@@ -80,7 +79,7 @@ module Utilities
           details.merge!("discount".to_sym => nil)
         end
         details.merge!("rating".to_sym => sub_page.search('.jumpBar .asinReviewsSummary .swSprite span').text().strip.gsub(/ out of 5 stars/,'').strip.gsub(/See all reviews/,''))
-        details.merge!("price".to_sym => sub_page.search('#actualPriceValue span').text().strip.gsub(/.00/,'').gsub(/\D/,''))
+        details.merge!("price".to_sym => sub_page.search('#actualPriceValue b span').text().strip.gsub(/.00/,'').gsub(/\D/,''))  
         details
       end
 

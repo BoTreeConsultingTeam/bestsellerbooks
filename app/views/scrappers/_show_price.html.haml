@@ -1,15 +1,15 @@
 #price_list.span6{style: "margin-left: 0px;"}
 	%table.table.table-striped
 		%tr
-			%td
+			%th
 				= "Site"
-			%td
+			%th
 				= "Price"
-			%td
+			%th
 				= "Discount"
-			%td
+			%th
 				= "Rating"
-			%td
+			%th
 			
 		- index = 0
 		-unless new_price_list.nil?
@@ -40,3 +40,4 @@
 					%td
 						%a{href: "#{price[:book_detail_url] }",target: "_blank"}
 							%i.icon-shopping-cart
+	.ajax-progress-1

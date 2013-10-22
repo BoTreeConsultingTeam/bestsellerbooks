@@ -27,47 +27,8 @@
 						= link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
 						\|
 .span6{style: "margin-left: 60px; margin-top: 21px;"}
-	%table#old-table.table.table-striped{style: "margin-bottom: 0px;"}
-		%tr
-			%td
-				= "Site"
-			%td
-				= "Price"
-			%td
-				= "Discount"
-			%td
-				= "Rating"
-			%td
-			
-		- index = 0
-		- @price_list.each do |price|
-			%tr
-				%td{style: "width: 139px;"}
-					- s = Site.site_name(price[:site_id]).first
-					= link_to s[:name], "#{price[:book_detail_url] }",target: "_blank"
-				%td{style: "width: 50px;"}
-					- if !price[:price].nil?
-						= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
-					- else
-						= "-"
-				%td{style: "width: 83px;"}
-					- if !price[:discount].nil?
-						= link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
-						\%
-					- else
-						= "-"
-				%td
-					- if !price[:rating].nil?
-						= hidden_field_tag "rating_#{index}", price[:rating]
-						.separate_star_rating{id: "star_#{index}"}
-						- index = index + 1
-					- else
-						= "-"
-				%td
-					%a{href: "#{price[:book_detail_url] }",target: "_blank"}
-						%i.icon-shopping-cart
 	#books_price
-	.ajax-progress-1
+		=render :partial => 'show_price', :locals => {new_price_list: @price_list}
 .span7
 	- if !@show_book_details[:description].nil?
-		= @show_book_details[:description].html_safe		
+		= @show_book_details[:description].html_safe
