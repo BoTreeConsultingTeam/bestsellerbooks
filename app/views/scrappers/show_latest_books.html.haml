@@ -6,5 +6,5 @@
     .span2
       = render :partial => 'category'
     .span10
-      %label.categor_label{ style: "font-weight: bold; font-size: 30px; color: #0088CC" }
+      %h4.categor_label{ style: "color: #0088CC" } All Best Sellers
       #books= render :partial => 'books_details', :locals => { paginate_action: "show" }

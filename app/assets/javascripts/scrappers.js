@@ -11,7 +11,7 @@ $(document).ready(function(){
       $("a.category_link").removeClass('.disabled');
       $(this).css("font-weight","bold");
       $(this).addClass('.disabled');
-      $(".categor_label").text("Bestselling In" + " " + $(this).text() + " " + "Category" );
+      $(".categor_label").text("Bestseller - " + $(this).text());
     });
 
    var search_data = $("#search_data").attr('value').split(',');

@@ -10,7 +10,7 @@
           %ul.thumbnails
             -row.each do |item|
               %li.span3.text-center
-                .thumbnail{style: "height: 300px; padding-top: 7px;",class: "thumbnail_book"}
+                .thumbnail
                   %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                     %img{:alt => "", :src => "#{item[:images]}", style: "height: 140px;"}
                   %p
@@ -28,7 +28,7 @@
     - else
       %p
         %p
-          %strong No records found
+          %strong No matching books found
 .row
   .pagination.pagination-right
     - if !@data.nil?
