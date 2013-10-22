@@ -27,8 +27,6 @@ class BookDetail < ActiveRecord::Base
           create_category_details(value[:category], book_details) if !value[:category].nil?
         end
         isbn = book_details[:isbn]
-        # book_data = find_book_meta(book_details, isbn, site_id)
-        # book_all_meta_data = book_meta_data + book_data
         create_book_meta(book_details, book_meta_data)
       end
     end
@@ -53,7 +51,7 @@ class BookDetail < ActiveRecord::Base
         flipkart = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:flipkart, url)
         book_data = BookDetail.process_search_book_data(flipkart, isbn, site[:id], book_data, url)
       elsif site[:name] == "amazon"
-        url = "http://www.amazon.in/site/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
+        url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
         amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
         book_data = BookDetail.process_search_book_data(amazon, isbn, site[:id], book_data, url)
       elsif site[:name] == "landmarkonthenet"
@@ -62,11 +60,10 @@ class BookDetail < ActiveRecord::Base
         book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
       end
     end
-    BookDetail.create_book_meta(book_details, book_data)
+    self.create_book_meta(book_details, book_data)
   end
 
-  def self.process_search_book_data(site_data, isbn, site_id, all_book_data, url)
-    puts site_data
+  def self.process_search_book_data(site_data, isbn, site_ids, all_book_data, url)
     unless site_data.nil?
       site_data.process_page
       book_data = site_data.book_details
@@ -75,7 +72,8 @@ class BookDetail < ActiveRecord::Base
           book_detail[:book_detail_url] = url
         end
         if !book_detail.empty? && !book_detail[:price].nil? && book_detail[:isbn] == isbn
-          book_detail.merge!("site_id".to_sym => site_id)
+          puts 
+          book_detail.merge!("site_id".to_sym => site_ids)
           all_book_data << book_detail
         end
       end
@@ -100,7 +98,7 @@ class BookDetail < ActiveRecord::Base
   end
 
   def self.show_books_details(page)
-  	BookDetail.order('title').page(page).per(12)
+  	self.order('title').page(page).per(12)
   end
 
   def self.refresh_books_detail!(fresh_list_of_books_details)
@@ -113,9 +111,7 @@ class BookDetail < ActiveRecord::Base
       if fresh_list_of_books_details.key?(isbn_key)
         book_meta_data = fresh_list_of_books_details[isbn_key][:book_meta_data]
         book_details = BookDetail.find_book_with_isbn(isbn_key).first
-        # site_having_book = book_details.book_metas.pluck(:site_id)
         book_meta_data.each do |site_id_key, meta|
-        # site_id = site_id_key
           old_price_list = book_details.book_metas.site_id(site_id_key).first
           if old_price_list.nil?
             meta.merge!(site_id: site_id_key)

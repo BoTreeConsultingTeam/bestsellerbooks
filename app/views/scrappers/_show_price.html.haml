@@ -1,5 +1,16 @@
 #price_list.span5{style: "margin-left: 0px;"}
 	%table.table.table-striped
+		%tr
+			%td
+				= "Site"
+			%td
+				= "Price"
+			%td
+				= "Discount"
+			%td
+				= "Rating"
+			%td
+			
 		- index = 0
 		-unless new_price_list.nil?
 			= hidden_field_tag 'new_avg_rating', @new_avg_rating
@@ -26,3 +37,6 @@
 							- index = index + 1
 						- else
 							= "-"
+					%td
+						%a{href: "#{price[:book_detail_url] }",target: "_blank"}
+							%i.icon-shopping-cart

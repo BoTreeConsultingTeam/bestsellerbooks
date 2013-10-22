@@ -7,4 +7,4 @@
       = render :partial => 'category'
     .span10
       %label.categor_label{ style: "font-weight: bold; font-size: 30px; color: #0088CC" }
-      #books= render :partial => 'books_details'
+      #books= render :partial => 'books_details', :locals => { paginate_action: "show" }

@@ -22,7 +22,7 @@ class ScrappersController < ApplicationController
   end
 
   def refresh_details
-    BookDetail.create_or_find_book_details!(Utilities::Scrappers::collect)
+    BookDetail.create_or_find_book_details!(Utilities::Scrappers::Scrapper.collect)
     redirect_to root_path
   end
 
@@ -31,7 +31,7 @@ class ScrappersController < ApplicationController
     sites_ids = book_details.book_metas.pluck(:site_id)
     
     BookDetail.find_book_meta(book_details, "#{params[:isbn].squish}", sites_ids)
-    @new_price_list = book_details.book_metas.where(site_id: (Site::ALL_SITE_IDS - sites_ids))
+    @new_price_list = BookDetail.book_price(book_details)
     @new_avg_rating = BookDetail.avg_rating(book_details)
   end
 

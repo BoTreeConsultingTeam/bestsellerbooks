@@ -16,7 +16,6 @@ module Utilities
           li.each_with_index do |li_item, index|
             title = li_item.search('.zg_itemWrapper .zg_title').text().squish.strip
             author = li_item.search('.zg_itemWrapper .zg_byline').text().gsub(/by/,'').squish.strip
-            # price = li_item.search('.zg_itemWrapper .zg_itemPriceBlock_compact .zg_price .price').text().strip.gsub(/Rs./,'').gsub(/.00/,'').gsub(/\D/,'')
             img_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a img').attr('src').text()
             href_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a').attr('href').text()
             rating = li_item.search('.zg_itemWrapper .zg_reviews .swSprite span').text().strip.gsub(/ out of 5 stars/,'')

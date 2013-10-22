@@ -1,33 +1,30 @@
 .row
   .pagination.pagination-right
     - if !@data.nil?
-      = paginate @data, :params => {:action => 'show'}, remote: true
+      = paginate @data, :params => {:action => paginate_action}, remote: true
   .span10
     = link_to "refresh", refresh_details_path
     - if !@data.nil?
-      - @data.each_slice(4).to_a.each do |row| 
+      - @data.each_slice(4).to_a.each do |row|
         .row-fluid
           %ul.thumbnails
             -row.each do |item|
               %li.span3.text-center
-                / = hidden_field_tag 'book_isbn', item[:isbn]
                 .thumbnail{style: "height: 300px; padding-top: 7px;",class: "thumbnail_book"}
-                  %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                  %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                     %img{:alt => "", :src => "#{item[:images]}", style: "height: 140px;"}
                   %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
-                      =item[:title]
+                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
+                      = label_tag item[:title], nil, class: 'bold', style: "font-size: 16px" 
                   %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
+                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true, style: "font-size: 12px"}
                       %strong By:
                       =item[:author]
                   %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}","data-remote" => true}
-                      %strong Best Buy Price:
+                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                       - min_price = BookDetail.book_price(item).first
-                      = min_price[:price]
-
-
+                      %strong
+                        = "Best Buy ₹ #{min_price[:price]}"
     - else
       %p
         %p

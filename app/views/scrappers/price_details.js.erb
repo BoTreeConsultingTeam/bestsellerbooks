@@ -7,13 +7,14 @@ $(document).ready(function(){
 	$.get( "scrappers/find_book_price", {isbn: data})
 	.done(function( data ) {
 		$(".ajax-progress-1").hide();
+		$("#old-table").hide();
   });
+	var avg_rating = $("#avg_rating").attr('value');
+	$('#star').raty({ readOnly: true,score: avg_rating,number: 5 });
+	$('#none_star').raty({ readOnly: true,score: 0,number: 5 });
+	var length = $("div[class*='separate_star_rating']").length;
+	for ( var i = 0; i < length; i++ ){
+		var rating = $("#rating_" + i).attr('value');
+		$("#star_" + i).raty({ readOnly: true, score: rating, number: 5 });
+	}
 });
-var avg_rating = $("#avg_rating").attr('value');
-$('#star').raty({ readOnly: true,score: avg_rating,number: 5 });
-$('#none_star').raty({ readOnly: true,score: 0,number: 5 });
-var length = $("div[class*='separate_star_rating']").length;
-for ( var i = 0; i < length; i++ ){
-	var rating = $("#rating_" + i).attr('value');
-	$("#star_" + i).raty({ readOnly: true, score: rating, number: 5 });
-}

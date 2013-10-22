@@ -6,7 +6,7 @@ class BookCategory < ActiveRecord::Base
   
   scope :book_category, pluck([:category_name])
 
-  def self.books_category(id,page)
+  def self.books_category(id, page)
     book_data = BookCategory.find(id).book_details.order('title').page(page).per(12).uniq
     book_data
   end

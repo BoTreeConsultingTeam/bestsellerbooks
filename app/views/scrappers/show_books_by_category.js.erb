@@ -1,2 +1,2 @@
-$('#books').html('<%= escape_javascript(render :partial => 'books_details') %>');
+$('#books').html('<%= escape_javascript(render :partial => 'books_details', :locals => {paginate_action: "show_books_by_category"}) %>');
 $('#dialog').dialog( "close" );

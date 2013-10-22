@@ -55,7 +55,6 @@ module Utilities
             end
           end
           category = []
-          # details.merge!("img_url".to_sym => sub_page.search('#visible-image-small').attr('src').text())
           a = sub_page.search('#fk-mainbody-id .fk-lbreadbcrumb span a')
           a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
           category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
@@ -78,7 +77,11 @@ module Utilities
           end
         end
         details.merge!("discount".to_sym => sub_page.search('#topsection .prices .fk-uppercase').text().gsub(/\D/,''))
-        details.merge!("price".to_sym => sub_page.search('#topsection .prices .pprice')[0].text().gsub(/\D/,''))
+        begin
+          details.merge!("price".to_sym => sub_page.search('#topsection .prices .pprice')[0].text().gsub(/\D/,''))
+        rescue => e
+          details.merge!("price".to_sym => nil)
+        end
         details.merge!("rating".to_sym => sub_page.search('.ratings-section .pp-big-star').text())
         details
       end

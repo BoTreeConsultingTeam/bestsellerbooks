@@ -18,7 +18,6 @@ module Utilities
             author = li_item.search('.info h2 a').text().squish.strip
             img_url = li_item.search('.image a img').attr('src').text()
             href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text()
-            # discount = li_item.search('.image .discount').text().strip.gsub(/\D/,'')
             meta = process_sub_page(href_url)
             unless meta.nil?
               li_map = { meta[:isbn] => {
