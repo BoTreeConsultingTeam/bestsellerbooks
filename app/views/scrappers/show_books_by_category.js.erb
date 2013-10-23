@@ -1,2 +1,3 @@
-$('#books').html('<%= escape_javascript(render :partial => 'books_details', :locals => {paginate_action: "show_books_by_category"}) %>');
+$('#books').html('<%= escape_javascript(render :partial => 'books_details', :locals => { paginate_action: "show_books_by_category" }) %>');
+$.unblockUI();
 $('#dialog').dialog( "close" );

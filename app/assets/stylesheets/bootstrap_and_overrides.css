@@ -14,3 +14,9 @@
 .table {
     margin-bottom: 0;
 }
+.book_author {
+	color: #0088CC;
+}
+abbr[title], abbr[data-original-title] {
+    border-bottom: medium none;
+}

@@ -53,14 +53,13 @@ module Utilities
               details.merge!("language".to_sym => language.gsub(/\W/,''))
             end
           end
-          category= []
-          
-          a = sub_page.search('#browse_nodes_bc li.clearfix a')
-          a.each_with_index { |a_item, index|
-            category << a_item.text().squish.gsub(/\n/, '').strip
-          }
-          category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          details.merge!("category".to_sym => category)
+          # category= []
+          # a = sub_page.search('#browse_nodes_bc li.clearfix a')
+          # a.each_with_index { |a_item, index|
+          #   category << a_item.text().squish.gsub(/\n/, '').strip
+          # }
+          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+          # details.merge!("category".to_sym => category)
           details.merge!("description".to_sym => sub_page.search('#description p').to_s)
           book_data = CrosswordScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
@@ -77,6 +76,13 @@ module Utilities
               details.merge!("isbn".to_sym => li_item.text().strip.gsub(/\D/,''))
             end
           end
+          category= []
+          a = sub_page.search('#browse_nodes_bc li.clearfix a')
+          a.each_with_index { |a_item, index|
+            category << a_item.text().squish.gsub(/\n/, '').strip
+          }
+          category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+          details.merge!("category".to_sym => category)
           begin
             rating = sub_page.search('#catalog-details .avg-cust-rating span').attr('rating').text()
           rescue Exception => e

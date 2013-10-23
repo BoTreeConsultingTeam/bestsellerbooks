@@ -36,7 +36,6 @@ module Utilities
             end
           end
         end
-        puts "Crawling Amazon Completed....."
       end
 
       def process_sub_page(href_url)
@@ -51,14 +50,14 @@ module Utilities
               details.merge!("publisher".to_sym => tr_items.text().strip.gsub(/Publisher:/,''))
             end
           end
-          category = []
-          details.merge!("description" => sub_page.search('#outer_postBodyPS').to_s)
-          a = sub_page.search('#SalesRank .zg_hrsr .zg_hrsr_ladder a')
-          a.each_with_index { |a_item, index|
-            category << a_item.text().squish.gsub(/\n/, '').strip
-          }
-          category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          details.merge!("category".to_sym => category)
+          # category = []
+          # details.merge!("description" => sub_page.search('#outer_postBodyPS').to_s)
+          # a = sub_page.search('#SalesRank .zg_hrsr .zg_hrsr_ladder a')
+          # a.each_with_index { |a_item, index|
+          #   category << a_item.text().squish.gsub(/\n/, '').strip
+          # }
+          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+          # details.merge!("category".to_sym => category)
           book_data = AmazonScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
         end
@@ -73,13 +72,21 @@ module Utilities
             details.merge!("isbn".to_sym => tr_items.text().gsub(/\D/,'')[2..14])
           end
         end
+        category = []
+        details.merge!("description" => sub_page.search('#outer_postBodyPS').to_s)
+        a = sub_page.search('#SalesRank .zg_hrsr .zg_hrsr_ladder a')
+        a.each_with_index { |a_item, index|
+          category << a_item.text().squish.gsub(/\n/, '').strip
+        }
+        category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+        details.merge!("category".to_sym => category)
         begin
           details.merge!("discount".to_sym => sub_page.search('#handleBuy .product tr.youSavePriceRow td.price').text().strip[-6..-1].gsub(/\D/,''))
         rescue Exception => e
           details.merge!("discount".to_sym => nil)
         end
         details.merge!("rating".to_sym => sub_page.search('.jumpBar .asinReviewsSummary .swSprite span').text().strip.gsub(/ out of 5 stars/,'').strip.gsub(/See all reviews/,''))
-        details.merge!("price".to_sym => sub_page.search('#actualPriceValue b span').text().strip.gsub(/.00/,'').gsub(/\D/,''))  
+        details.merge!("price".to_sym => sub_page.search('#actualPriceValue b span').text().strip.gsub(/.00/,'').gsub(/\D/,''))
         details
       end
 

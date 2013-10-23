@@ -3,11 +3,11 @@ $('#dialog').dialog({ height: 505,width: 730, modal: true });
 
 $(document).ready(function(){
 	$(".ajax-progress-1").show();
+
 	var data = $('#book_isbn').text();
 	$.get( "books/find_book_price", {isbn: data})
 	.done(function( data ) {
 		$(".ajax-progress-1").hide();
-		$("#old-table").hide();
   });
 	var avg_rating = $("#avg_rating").attr('value');
 	$('#star').raty({ readOnly: true,score: avg_rating,number: 5 });

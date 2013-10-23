@@ -1,0 +1,4 @@
+- unless book_category_details.nil?
+	- book_category_details.each do |category_detail|
+		= link_to category_detail[:category_name], show_books_by_category_path(category_detail[:id]),method: :get,class: "book_category_link",remote: true
+		\|

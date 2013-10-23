@@ -11,20 +11,21 @@
             -row.each do |item|
               %li.span3.text-center
                 .thumbnail
-                  %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
+                  %a{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                     %img{:alt => "", :src => "#{item[:images]}", style: "height: 140px;"}
                   %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
+                    %a{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
                       = label_tag item[:title], nil, class: 'bold', style: "font-size: 16px" 
+                  %p.book_author
+                    %strong By:
+                    =item[:author]
                   %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
-                      %strong By:
-                      =item[:author]
-                  %p
-                    %a.popup{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
-                      - min_price = BookDetail.book_price(item).first
+                    - min_price = BookDetail.book_price(item).first
+                    %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank"}
                       %strong
-                        = "Best Buy ₹ #{min_price[:price]}"
+                        %a.initialism{title: "buy @#{min_price.site[:name]}"}
+                          = "Best Buy ₹ #{min_price[:price]}"
+                          = hidden_field_tag "min_price_site_name", min_price.site[:name]
     - else
       %p
         %p

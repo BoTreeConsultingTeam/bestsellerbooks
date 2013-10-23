@@ -51,11 +51,11 @@ module Utilities
               details.merge!("language".to_sym => language.gsub(/\W/,''))  
             end          
           end
-          a = sub_page.search('#product-breadcrumbs li a')
-          category = []
-          a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
-          category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          details.merge!("category".to_sym => category)
+          # a = sub_page.search('#product-breadcrumbs li a')
+          # category = []
+          # a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
+          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+          # details.merge!("category".to_sym => category)
           book_data = LandmarkScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
         end
@@ -71,6 +71,11 @@ module Utilities
             details.merge!("isbn".to_sym => li_item.text().strip.last(13))
           end
         end
+        a = sub_page.search('#product-breadcrumbs li a')
+        category = []
+        a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
+        category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+        details.merge!("category".to_sym => category)
         details.merge!("discount".to_sym => sub_page.search('#thumbnailwrapper .discount-badge').text().gsub(/\D/,'').squish.strip)
         details.merge!("price".to_sym => sub_page.search('.pricebox .price-current').text().gsub(/\D/,'').squish.strip)
         details

@@ -54,11 +54,11 @@ module Utilities
               details.merge!("author".to_sym => td_items.search('.specs-value a').text())
             end
           end
-          category = []
-          a = sub_page.search('#fk-mainbody-id .fk-lbreadbcrumb span a')
-          a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
-          category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          details.merge!("category".to_sym => category)
+          # category = []
+          # a = sub_page.search('#fk-mainbody-id .fk-lbreadbcrumb span a')
+          # a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
+          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+          # details.merge!("category".to_sym => category)
           details.merge!("description".to_sym => sub_page.search('#description .item_desc_text p').to_s)
           book_data = FlipkartScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
@@ -76,6 +76,11 @@ module Utilities
             details.merge!("isbn".to_sym => td_items.search('.specs-value').text())
           end
         end
+        category = []
+        a = sub_page.search('#fk-mainbody-id .fk-lbreadbcrumb span a')
+        a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
+        category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+        details.merge!("category".to_sym => category)
         details.merge!("discount".to_sym => sub_page.search('#topsection .prices .fk-uppercase').text().gsub(/\D/,''))
         begin
           details.merge!("price".to_sym => sub_page.search('#topsection .prices .pprice')[0].text().gsub(/\D/,''))

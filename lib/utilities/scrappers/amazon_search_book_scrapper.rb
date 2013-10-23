@@ -15,7 +15,7 @@ module Utilities
           end
           sub_page = page_instance(href_url)
           unless sub_page.nil?
-          meta = AmazonScrapper.process_book_data_page(sub_page)
+            meta = AmazonScrapper.process_book_data_page(sub_page)
             meta.merge!("book_detail_url".to_sym => href_url)
             add_book_details(meta)            
           end
