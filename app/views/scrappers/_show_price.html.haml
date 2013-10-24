@@ -2,6 +2,8 @@
 	%table.table.table-striped
 		%tr
 			%th
+
+			%th
 				= "Site"
 			%th
 				= "Price"
@@ -10,15 +12,31 @@
 			%th
 				= "Rating"
 			%th
+				= "No. Uers Rated"
+			%th
+				= "Delivery Days"
+			%th
 			
 		- index = 0
 		-unless new_price_list.nil?
 			= hidden_field_tag 'new_avg_rating', @new_avg_rating
 			- new_price_list.each do |price|
 				%tr
+					- site = Site.site_name(price[:site_id]).first
+					%td
+						- case site.name
+							- when "amazon"
+								= image_tag("amazon_ico.png", size: "20x20")
+							- when "flipkart"
+								= image_tag("favicon_b994e296.ico", size: "20x20")
+							- when "landmarkonthenet"
+								= image_tag("favicon_ico.ico", size: "20x20")
+							- when "crossword"
+								= image_tag("crossword_ico.ico", size: "20x20")
+							- when "unread"
+								= image_tag("unread_ico.ico", size: "20x20")
 					%td{style: "width: 139px;"}
-						- s = Site.site_name(price[:site_id]).first
-						= link_to s[:name], "#{price[:book_detail_url] }",target: "_blank"
+						= link_to site[:name], "#{price[:book_detail_url] }",target: "_blank"
 					%td{style: "width: 50px;"}
 						- if !price[:price].nil?
 							= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
@@ -37,6 +55,10 @@
 							- index = index + 1
 						- else
 							= "-"
+					%td
+						= price[:rating_count]
+					%td
+						= price[:delivery_days]
 					%td
 						%a{href: "#{price[:book_detail_url] }",target: "_blank"}
 							%i.icon-shopping-cart

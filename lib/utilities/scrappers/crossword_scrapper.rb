@@ -29,6 +29,8 @@ module Utilities
                 publisher: meta[:publisher],
                 description: meta[:description],
                 category: meta[:category],
+                delivery_days: meta[:meta],
+                rating_count: meta[:rating_count],
                 book_meta_data: { "#{site_id[:id]}" => { rating: meta[:rating], price: price.gsub(/\D/,''), discount: meta[:discount], 
                   book_detail_url: href_url }}
               }}
@@ -85,12 +87,19 @@ module Utilities
           details.merge!("category".to_sym => category)
           begin
             rating = sub_page.search('#catalog-details .avg-cust-rating span').attr('rating').text()
+            rating_count = sub_page.search('#catalog-title .avg-cust-rating a').text().gsub(/\D/,'').squish.strip
           rescue Exception => e
             rating = nil
+            rating_count = nil
           end
+          delivery_days =  sub_page.search('#in_stock .ships-in b').text().squish.strip
+          details.merge!("delivery_days".to_sym => delivery_days)
+          # details.merge!("shipping_detail".to_sym => sub_page.search('#in_stock .ships-in ').text().gsub(/\'Ships in'/,'').squish.strip)
           details.merge!("discount".to_sym => sub_page.search('#pricing_summary .discount_gola').text().gsub(/\D/,''))
           details.merge!("rating".to_sym => rating)
+          details.merge!("rating_count".to_sym => rating_count)
         end
+        puts details
         details
       end
 

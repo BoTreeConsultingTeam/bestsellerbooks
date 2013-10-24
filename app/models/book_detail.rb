@@ -15,7 +15,7 @@ class BookDetail < ActiveRecord::Base
   def self.create_or_find_book_details!(books)
     refresh_books_detail!(books)
     books.each do |key, value|
-      book_details = BookDetail.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title],language: value[:language],publisher: value[:publisher],description: value[:description])
+      book_details = BookDetail.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description])
       unless book_details.persisted?
         site_id = []
         book_details.save
@@ -34,7 +34,7 @@ class BookDetail < ActiveRecord::Base
 
   def self.create_book_meta(book_details, book_data)
     book_data.each do |meta|
-      book_details.book_metas.create(site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
+      book_details.book_metas.create(rating_count: meta[:rating_count],delivery_days: meta[:meta],site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
     end
   end
   
@@ -59,6 +59,10 @@ class BookDetail < ActiveRecord::Base
         url = "http://www.landmarkonthenet.com/search/?q=" + isbn
         landmarkonthenet = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:landmark, url)
         book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
+      elsif site[:name] == "unread"
+        url = "http://www.uread.com/search-books/" + isbn
+        uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:uread, url)
+        book_data = BookDetail.process_search_book_data(uread, isbn, site[:id], book_data, url)
       end
     end
     logger.debug "#{book_data}"
