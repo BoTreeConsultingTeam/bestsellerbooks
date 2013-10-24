@@ -33,4 +33,4 @@
 .row
   .pagination.pagination-right
     - if !@data.nil?
-      = paginate @data, :params => {:action => 'show'}, remote: true
+      = paginate @data, :params => {:action => paginate_action}, remote: true

@@ -30,3 +30,12 @@
 .span7
 	- if !@show_book_details[:description].nil?
 		= @show_book_details[:description].html_safe
+
+:javascript
+	$(function(){
+		$('#book_category_details').on('click', 'a.book_category_link', function(){
+			var category_id = $(this).data('category-id');
+			$(".link_" + category_id).trigger( "click" );
+			$('#dialog').dialog( "close" );
+		});
+	});

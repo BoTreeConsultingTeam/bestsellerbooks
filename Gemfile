@@ -4,7 +4,7 @@ gem 'rails', '3.2.14'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-
+gem 'kaminari'
 #gem "bootstrap-sass"
 gem "twitter-bootstrap-rails", "2.2.7"
 gem 'mechanize'
@@ -19,7 +19,6 @@ gem "pg"
 gem "jquery-raty-rails"
 # Gems used only for assets and not required
 # in production environments by default.
-gem 'kaminari'
 group :assets do
   gem 'sass-rails'
   gem 'coffee-rails'

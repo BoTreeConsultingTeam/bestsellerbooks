@@ -1,4 +1,4 @@
 %ul.nav.nav-list
-  - @book_category.each do |c|
+  - @book_category.each do |category|
     %li
-      = link_to c[:category_name], show_books_by_category_path(c[:id]),method: :get,remote: true,class: "category_link"
+      = link_to category[:category_name], show_books_by_category_path(category[:id]),method: :get,remote: true,class: "category_link link_#{category[:id]}"
