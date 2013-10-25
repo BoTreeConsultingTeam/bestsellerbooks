@@ -1,6 +1,6 @@
 module Utilities
   module Scrappers
-    class UnreadScrapper < Scrapper
+    class UreadScrapper < Scrapper
 
       URL = 'http://www.uread.com/view-books/10/uread-top'
 
@@ -9,10 +9,10 @@ module Utilities
       end
 
       def process_page
-        puts "Started Crawling Unread....."
+        puts "Started Crawling Uread....."
         unless page.nil?
           li = page.search('#listSearchResult .list-view-books')
-          site_id = Site.find_by_name("unread")
+          site_id = Site.find_by_name("uread")
           li.each do |li_item|
             title = li_item.search('.product-summary .title a').text().squish.strip
             author = li_item.search('.product-summary .author-publisher a')[0].text().squish.strip
@@ -30,7 +30,7 @@ module Utilities
             #   end
             # end
             sub_page = page_instance(href_url)
-            meta = UnreadScrapper.process_sub_page(sub_page)
+            meta = UreadScrapper.process_sub_page(sub_page)
             unless meta.empty?
               li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
@@ -39,17 +39,15 @@ module Utilities
                 language: nil,
                 publisher: meta[:publisher],
                 description: meta[:description],
-                rating_count: meta[:rating_count],
                 description: meta[:description],
-                delivery_days: meta[:meta],
-                book_meta_data: { "#{site_id[:id]}" => { rating: meta[:rating], price: meta[:price],
-                 discount: meta[:discount], book_detail_url: href_url }}
+                book_meta_data: { "#{site_id[:id]}" => { price: meta[:price], rating_count: meta[:rating_count], rating: meta[:rating],
+                 delivery_days: meta[:meta], discount: meta[:discount], book_detail_url: href_url }}
               }} 
               add_book_details(li_map)
             end
           end
         end
-        puts "Crawling Unread Completed....."
+        puts "Crawling Uread Completed....."
       end
 
       def self.process_sub_page(sub_page)
@@ -61,21 +59,23 @@ module Utilities
         rescue Exception => e
           details.merge!("discount".to_sym => nil)
         end
-        details.merge!("delivery_days".to_sym => sub_page.search('#ctl00_phBody_ProductDetail_lblBusiness b').text().squish.strip)
-        # details.merge!("shipping_detail".to_sym => sub_page.search('#ctl00_phBody_ProductDetail_lblBusiness b').text().squish.strip)
+        details.merge!("delivery_days".to_sym => sub_page.search('#ctl00_phBody_ProductDetail_lblBusiness b').text().gsub(" Business Days",'').squish)
         details.merge!("rating_count".to_sym => sub_page.search('#ctl00_phBody_ProductDetail_lblTotalReview a').text().gsub(/\D/,'').squish)
         img = sub_page.search('.about-book .avg-customer-rating img')
         index_star = 0
         img.each do |img_item|
-          if img_item.attr('href') == "Red Star"
+          if img_item.attr('alt') == "Red Star"
             index_star = index_star + 1
           end
+        end
+        if index_star == 0
+          index_star = nil
         end
         details.merge!("rating".to_sym => index_star)
         details.merge!("price".to_sym => sub_page.search('#ctl00_phBody_ProductDetail_lblourPrice').text().strip.gsub(/\D/,'').squish)
         details
       end
-      
+
     end
   end
 end

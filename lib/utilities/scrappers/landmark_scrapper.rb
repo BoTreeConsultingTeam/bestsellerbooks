@@ -11,7 +11,7 @@ module Utilities
       def process_page
         puts "Started crawling LandmarkOnline....."
         unless page.nil?
-          li = page.search('#main-column section.productblock article.product')[1..6]
+          li = page.search('#main-column section.productblock article.product')[1..4]
           site_id = Site.find_by_name("landmarkonthenet")
           li.each_with_index do |li_item, index|
             title = li_item.search('.info h1 a').attr('title').text().squish.strip
@@ -20,16 +20,16 @@ module Utilities
             href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text()
             meta = process_sub_page(href_url)
             unless meta.nil?
-              li_map = { meta[:isbn] => {
+              li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
                 author: author,
                 title: title,
                 language: meta[:language],
                 publisher: meta[:publisher],
-                delivery_days: meta[:meta],
                 description: meta[:description],
                 category: meta[:category],
-                book_meta_data: { site_id[:id] => { price: meta[:price], discount: meta[:discount], book_detail_url: href_url }}
+                book_meta_data: { "#{site_id[:id]}" => { price: meta[:price], discount: meta[:discount],
+                  delivery_days: meta[:meta], book_detail_url: href_url }}
               }}
               add_book_details(li_map)
             end
@@ -81,13 +81,10 @@ module Utilities
         details.merge!("discount".to_sym => sub_page.search('#thumbnailwrapper .discount-badge').text().gsub(/\D/,'').squish.strip)
         details.merge!("price".to_sym => sub_page.search('.pricebox .price-current').text().gsub(/\D/,'').squish.strip)
         begin
-          # details.merge!("shipping_detail".to_sym => sub_page.search('.primary table.delivery-info tr td')[3].text().squish.strip)
-          details.merge!("delivery_days".to_sym => sub_page.search('.primary table.delivery-info tr td')[7].text().squish.strip)
+          details.merge!("delivery_days".to_sym => sub_page.search('.primary table.delivery-info tr td')[7].text().gsub("Delivered in ",'').gsub("working",'').gsub(" days",'').gsub("DELIVERED IN ",'').gsub("WORKING",'').gsub(" DAYS",'').squish.strip)
         rescue Exception => e
-          # details.merge!("shipping_detail".to_sym => nil)
           details.merge!("delivery_days".to_sym => nil)
         end
-        puts details
         details
       end
       

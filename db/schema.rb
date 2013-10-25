@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131024110613) do
+ActiveRecord::Schema.define(:version => 20131025111939) do
 
   create_table "book_categories", :force => true do |t|
     t.text     "category_name"
@@ -24,11 +24,13 @@ ActiveRecord::Schema.define(:version => 20131024110613) do
     t.string   "author"
     t.string   "title"
     t.string   "isbn"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
     t.string   "publisher"
     t.string   "language"
     t.text     "description"
+    t.float    "average_rating"
+    t.integer  "occurrence"
   end
 
   create_table "book_meta", :force => true do |t|
@@ -42,8 +44,9 @@ ActiveRecord::Schema.define(:version => 20131024110613) do
     t.float    "rating"
     t.integer  "rating_count"
     t.string   "delivery_days"
-    t.string   "shipping_detail"
   end
+
+  add_index "book_meta", ["book_detail_id", "site_id"], :name => "index_book_meta_on_book_detail_id_and_site_id", :unique => true
 
   create_table "category_details", :force => true do |t|
     t.integer  "book_category_id"

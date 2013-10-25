@@ -1,6 +1,6 @@
 .row
   .pagination.pagination-right
-    - if !@data.nil?
+    - unless @data.nil?
       = paginate @data, :params => {:action => paginate_action}, remote: true
   .span10
     -#= link_to "refresh", refresh_details_path
@@ -32,5 +32,5 @@
           %strong No matching books found
 .row
   .pagination.pagination-right
-    - if !@data.nil?
+    - unless @data.nil?
       = paginate @data, :params => {:action => paginate_action}, remote: true

@@ -12,8 +12,6 @@
 			%th
 				= "Rating"
 			%th
-				= "No. Uers Rated"
-			%th
 				= "Delivery Days"
 			%th
 			
@@ -33,30 +31,28 @@
 								= image_tag("favicon_ico.ico", size: "20x20")
 							- when "crossword"
 								= image_tag("crossword_ico.ico", size: "20x20")
-							- when "unread"
-								= image_tag("unread_ico.ico", size: "20x20")
+							- when "uread"
+								= image_tag("uread_ico.ico", size: "20x20")
 					%td{style: "width: 139px;"}
 						= link_to site[:name], "#{price[:book_detail_url] }",target: "_blank"
 					%td{style: "width: 50px;"}
-						- if !price[:price].nil?
-							= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
-						- else
+						- if price[:price].nil?
 							= "-"
+						- else
+							= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
 					%td{style: "width: 83px;"}
-						- if !price[:discount].nil?
+						- if price[:discount].nil?
+							= "-"
+						- else
 							= link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
 							\%
-						- else
-							= "-"
 					%td
-						- if !price[:rating].nil?
+						- if price[:rating].nil?
+							= "-"
+						- else
 							= hidden_field_tag "new_rating_#{index}", price[:rating]
 							.new_separate_star_rating{id: "new_star_#{index}"}
 							- index = index + 1
-						- else
-							= "-"
-					%td
-						= price[:rating_count]
 					%td
 						= price[:delivery_days]
 					%td

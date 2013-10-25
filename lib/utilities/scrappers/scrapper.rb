@@ -48,8 +48,8 @@ module Utilities
             Utilities::Scrappers::LandmarkScrapper.new
           when :crossword
             Utilities::Scrappers::CrosswordScrapper.new
-          when :unread
-            Utilities::Scrappers::UnreadScrapper.new
+          when :uread
+            Utilities::Scrappers::UreadScrapper.new
         end
       end
 
@@ -63,28 +63,28 @@ module Utilities
             Utilities::Scrappers::LandmarkSearchBookScrapper.new(site_url)
           when :crossword
             Utilities::Scrappers::CrosswordSearchBookScrapper.new(site_url)
-          when :unread
-            Utilities::Scrappers::UnreadSearchBookScrapper.new(site_url)
+          when :uread
+            Utilities::Scrappers::UreadSearchBookScrapper.new(site_url)
         end
       end
 
       def self.collect
         unique_books_details = {}
 
-        # amazon = get_main_page_scrapper(:amazon)
-        # unique_books_details = amazon.crawl(unique_books_details)
+        amazon = get_main_page_scrapper(:amazon)
+        unique_books_details = amazon.crawl(unique_books_details)
 
-        # flipkart = get_main_page_scrapper(:flipkart)
-        # unique_books_details = flipkart.crawl(unique_books_details)
+        flipkart = get_main_page_scrapper(:flipkart)
+        unique_books_details = flipkart.crawl(unique_books_details)
 
         landmark = get_main_page_scrapper(:landmark)
         unique_books_details = landmark.crawl(unique_books_details)
 
-        # crossword = get_main_page_scrapper(:crossword)
-        # unique_books_details = crossword.crawl(unique_books_details)
+        crossword = get_main_page_scrapper(:crossword)
+        unique_books_details = crossword.crawl(unique_books_details)
 
-        # unread = get_main_page_scrapper(:unread)
-        # unique_books_details = unread.crawl(unique_books_details)
+        uread = get_main_page_scrapper(:uread)
+        unique_books_details = uread.crawl(unique_books_details)
       end
     end
 

@@ -11,7 +11,7 @@ module Utilities
       def process_page
         puts "Started Crawling Amazon....."
         unless page.nil?
-          li = page.search('#zg .zg_itemImmersion')[1..6]
+          li = page.search('#zg .zg_itemImmersion')
           site_id = Site.find_by_name("amazon")
           li.each_with_index do |li_item, index|
             title = li_item.search('.zg_itemWrapper .zg_title').text().squish.strip
@@ -29,20 +29,19 @@ module Utilities
                 publisher: meta[:publisher],
                 description: meta[:description],
                 category: meta[:category],
-                rating_count: meta[:rating_count],
                 description: meta[:description],
-                delivery_days: meta[:meta],
-                book_meta_data: { "#{site_id[:id]}" => { rating: rating, price: meta[:price],
-                 discount: meta[:discount], book_detail_url: href_url }}
+                book_meta_data: { "#{site_id[:id]}" => { rating: rating, price: meta[:price], rating_count: meta[:rating_count],
+                 delivery_days: meta[:meta], discount: meta[:discount], book_detail_url: href_url }}
               }}          
               add_book_details(li_map)
             end
           end
         end
+        puts "Crawling Amazon Completed....."
       end
 
       def process_sub_page(href_url)
-        sub_page = page_instance(href_url)
+        sub_page = page_instance(href_url)  
         details = {}
         unless sub_page.nil?
           find_label = sub_page.search('#divsinglecolumnminwidth table .bucket .content ul li')
@@ -53,14 +52,9 @@ module Utilities
               details.merge!("publisher".to_sym => tr_items.text().strip.gsub(/Publisher:/,''))
             end
           end
-          # category = []
-          # details.merge!("description" => sub_page.search('#outer_postBodyPS').to_s)
-          # a = sub_page.search('#SalesRank .zg_hrsr .zg_hrsr_ladder a')
-          # a.each_with_index { |a_item, index|
-          #   category << a_item.text().squish.gsub(/\n/, '').strip
-          # }
-          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          # details.merge!("category".to_sym => category)
+          
+          details.merge!("description" => sub_page.search('#outer_postBodyPS').to_s)
+          
           book_data = AmazonScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
         end
@@ -81,19 +75,20 @@ module Utilities
           details.merge!("discount".to_sym => nil)
         end
         begin
-          details.merge!("delivery_days".to_sym => sub_page.search('#deliveryMessage b')[0].text().squish.strip)
+          details.merge!("delivery_days".to_sym => sub_page.search('#deliveryMessage b').text().squish.strip)
         rescue Exception => e
           details.merge!("delivery_days".to_sym => nil)
         end
-        # begin
-        #   details.merge!("shipping_detail".to_sym => sub_page.search('#actualPriceExtraMessaging b')[0].text().squish.strip)
-        # rescue Exception => e
-        #   details.merge!("shipping_detail".to_sym => nil)
-        # end
+        category = []
+        a = sub_page.search('#SalesRank .zg_hrsr .zg_hrsr_ladder a')
+        a.each_with_index { |a_item, index|
+          category << a_item.text().squish.gsub(/\n/, '').strip
+        }
+        category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
+        details.merge!("category".to_sym => category)
         details.merge!("rating_count".to_sym => sub_page.search('#acr .acrCount .noTextDecoration').text().gsub(/\D/,''))
         details.merge!("rating".to_sym => sub_page.search('.jumpBar .asinReviewsSummary .swSprite span').text().strip.gsub(/ out of 5 stars/,'').strip.gsub(/See all reviews/,''))
         details.merge!("price".to_sym => sub_page.search('#actualPriceValue b span').text().strip.gsub(/\D/,'').squish[0..-3])
-        puts details
         details
       end
 

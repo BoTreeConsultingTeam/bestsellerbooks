@@ -1,5 +1,5 @@
 class BookDetail < ActiveRecord::Base
-  attr_accessible :rating,:author, :images, :isbn, :title, :publisher,:language,:description
+  attr_accessible :rating, :author, :images, :isbn, :title, :publisher, :language, :description, :occurrence, :average_rating
   validates :isbn, presence: true
 
   has_many :category_details, dependent: :destroy
@@ -8,14 +8,17 @@ class BookDetail < ActiveRecord::Base
   
   scope :find_book_with_id, lambda { |book_details_id| where(id: book_details_id) }
   scope :find_book_with_isbn,  lambda { |book_details_isbn| where(isbn: book_details_isbn) }
-  scope :search_books_details,  lambda { |detail, page| where("author ilike '%#{detail}%' or isbn = '%#{detail}%' or title ilike '%#{detail}%' or publisher ilike '%#{detail}%' or language ilike '%#{detail}%'").order('title').page(page).per(12) }
+  scope :search_books_details,  lambda { |detail, page| where("author ilike '%#{detail}%' or isbn = '%#{detail}%' or title ilike '%#{detail}%' or publisher ilike '%#{detail}%' or language ilike '%#{detail}%'").order('occurrence DESC').order('average_rating DESC').page(page).per(12) }
   scope :book_author, pluck([:author])
   scope :book_title, pluck([:title])
 
   def self.create_or_find_book_details!(books)
     refresh_books_detail!(books)
     books.each do |key, value|
-      book_details = BookDetail.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description])
+      meta = self.calculate_rating_avg(books[key][:book_meta_data])
+      average_rating = meta[0]
+      occurrence = meta[1]
+      book_details = self.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description], average_rating: average_rating, occurrence: occurrence)
       unless book_details.persisted?
         site_id = []
         book_details.save
@@ -31,10 +34,31 @@ class BookDetail < ActiveRecord::Base
       end
     end
   end
-
+  def self.calculate_rating_avg(book_meta_data)
+    site_id = Site::ALL_SITE_IDS
+    rating = []
+    rating_count = []
+    index = 0
+    site_id.each do |site|
+      if book_meta_data.key?("#{site}")
+        index = index + 1
+        data = book_meta_data["#{site}"]
+        rating << (data[:rating].to_f * data[:rating_count].to_i)
+        rating_count << data[:rating_count].to_i
+      end
+    end
+    begin
+      rating.delete(0)
+      avg = (rating.compact).sum / (rating_count.compact).sum
+    rescue Exception => e
+      avg = nil
+    end
+    meta = [avg, rating_count.count]
+    meta
+  end
   def self.create_book_meta(book_details, book_data)
     book_data.each do |meta|
-      book_details.book_metas.create(rating_count: meta[:rating_count],delivery_days: meta[:meta],site_id: meta[:site_id],book_detail_url: meta[:book_detail_url],price: meta[:price],discount: meta[:discount],rating: meta[:rating])
+      book_details.book_metas.create!(rating_count: meta[:rating_count], delivery_days: meta[:delivery_days], site_id: meta[:site_id], book_detail_url: meta[:book_detail_url], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
     end
   end
   
@@ -46,23 +70,23 @@ class BookDetail < ActiveRecord::Base
       if site[:name] == "crossword"
         url = "http://www.crossword.in/books/search?q=" + isbn
         crossword = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:crossword, url)
-        book_data = BookDetail.process_search_book_data(crossword, isbn, site[:id], book_data, url)
+        book_data = self.process_search_book_data(crossword, isbn, site[:id], book_data, url)
       elsif site[:name] == "flipkart"
         url = "http://www.flipkart.com/search?q=" + isbn
         flipkart = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:flipkart, url)
-        book_data = BookDetail.process_search_book_data(flipkart, isbn, site[:id], book_data, url)
+        book_data = self.process_search_book_data(flipkart, isbn, site[:id], book_data, url)
       elsif site[:name] == "amazon"
         url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
         amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
-        book_data = BookDetail.process_search_book_data(amazon, isbn, site[:id], book_data, url)
+        book_data = self.process_search_book_data(amazon, isbn, site[:id], book_data, url)
       elsif site[:name] == "landmarkonthenet"
         url = "http://www.landmarkonthenet.com/search/?q=" + isbn
         landmarkonthenet = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:landmark, url)
-        book_data = BookDetail.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
-      elsif site[:name] == "unread"
+        book_data = self.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
+      elsif site[:name] == "uread"
         url = "http://www.uread.com/search-books/" + isbn
         uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:uread, url)
-        book_data = BookDetail.process_search_book_data(uread, isbn, site[:id], book_data, url)
+        book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url)
       end
     end
     logger.debug "#{book_data}"
@@ -78,7 +102,6 @@ class BookDetail < ActiveRecord::Base
           book_detail[:book_detail_url] = url
         end
         if !book_detail.empty? && !book_detail[:price].nil? && book_detail[:isbn] == isbn
-          puts 
           book_detail.merge!("site_id".to_sym => site_ids)
           all_book_data << book_detail
         end
@@ -103,31 +126,38 @@ class BookDetail < ActiveRecord::Base
     avg_rating 
   end
 
+  def self.avg_rating_with_user(book)
+    all_rating = book.book_metas.pluck(:rating).compact
+    rating_count = book.book_metas.pluck(:rating_count).compact
+    avg_rating = !all_rating.empty? ? (all_rating.sum) / (rating_count.sum) : nil
+    avg_rating 
+  end
+
   def self.show_books_details(page)
-  	self.order('title').page(page).per(12)
+  	self.order('occurrence DESC').order('average_rating DESC').page(page).per(12)
   end
 
   def self.refresh_books_detail!(fresh_list_of_books_details)
     existing_books  = {}
-    database_books_details_isbn = BookDetail.pluck(:isbn)
+    database_books_details_isbn = self.pluck(:isbn)
     database_books_details_isbn.each { |isbn|
       existing_books.merge!(isbn => isbn)
     }
     existing_books.each do |isbn_key, value|
       if fresh_list_of_books_details.key?(isbn_key)
         book_meta_data = fresh_list_of_books_details[isbn_key][:book_meta_data]
-        book_details = BookDetail.find_book_with_isbn(isbn_key).first
+        book_details = self.find_book_with_isbn(isbn_key).first
         book_meta_data.each do |site_id_key, meta|
           old_price_list = book_details.book_metas.site_id(site_id_key).first
           if old_price_list.nil?
             meta.merge!(site_id: site_id_key)
-            book_details.book_metas.create(meta)
+            book_details.book_metas.create!(meta)
           else
             old_price_list.update_attributes(price: meta[:price], discount: meta[:discount], rating: meta[:rating])
           end
         end
       else
-        BookDetail.find_book_with_isbn(isbn_key).first.destroy
+        self.find_book_with_isbn(isbn_key).first.destroy
       end
     end
   end
@@ -163,8 +193,8 @@ class BookDetail < ActiveRecord::Base
   end
 
   def self.auto_search_data
-    search_data = BookDetail.pluck([:author]).uniq
-    search_data << BookDetail.pluck([:title]).uniq
+    search_data = self.pluck([:author]).uniq
+    search_data << self.pluck([:title]).uniq
     search_data = search_data.join(',')
     search_data
   end

@@ -28,7 +28,7 @@
 	#books_price
 		=render :partial => 'show_price', :locals => {new_price_list: @price_list}
 .span7
-	- if !@show_book_details[:description].nil?
+	- unless @show_book_details[:description].nil?
 		= @show_book_details[:description].html_safe
 
 :javascript

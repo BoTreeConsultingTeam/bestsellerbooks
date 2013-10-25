@@ -11,7 +11,7 @@ module Utilities
       def process_page
         puts "Started Crawling Flipkart....."
         unless page.nil?
-          li = page.search('#search_results .fk-srch-item')[1..6]
+          li = page.search('#search_results .fk-srch-item')
           site_id = Site.find_by_name("flipkart")
           li.each_with_index do |li_item, index|
             title = li_item.search('.fk-sitem-image-section a img').attr('title').text().squish.strip
@@ -20,18 +20,16 @@ module Utilities
             href_url = 'http://www.flipkart.com' + li_item.search('.fk-sitem-image-section a').attr('href').text()
             meta = process_sub_page(href_url)
             unless meta.empty?
-              li_map = { meta[:isbn] => {
+              li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
                 author: meta[:author],
                 title: title,
                 language: meta[:language],
                 publisher: meta[:publisher],
                 category: meta[:category],
-                delivery_days: meta[:meta],
-                rating_count: meta[:rating_count],
                 description: meta[:description],
-                book_meta_data: { "#{site_id[:id]}" => { rating: meta[:rating], price: meta[:price], discount: meta[:discount], 
-                  book_detail_url: href_url }}
+                book_meta_data: { "#{site_id[:id]}" => { rating: meta[:rating], price: meta[:price], discount: meta[:discount], delivery_days: meta[:delivery_days],
+                  rating_count: meta[:rating_count], book_detail_url: href_url }}
               }}
               add_book_details(li_map)
             end
@@ -89,11 +87,10 @@ module Utilities
         rescue => e
           details.merge!("price".to_sym => nil)
         end
-        details.merge!("delivery_days".to_sym => sub_page.search('.mprod-summary .right-stock-sec .shipping-details .fk-font-bold').text().squish.strip)
-        # details.merge!("shipping_detail".to_sym => sub_page.search('.mprod-summary .pp-shipping-message').text().squish.strip)
-        details.merge!("rating_count".to_sym => sub_page.search('.ratings-section .tpadding10 span').text().gsub(/\D/,''))
+        
+        details.merge!("delivery_days".to_sym => sub_page.search('.mprod-summary .right-stock-sec .shipping-details .fk-font-bold').text().gsub(/\ business days./,'').squish)
+        details.merge!("rating_count".to_sym => sub_page.search('.ratings-section .tpadding10 span').text().gsub(/\D/,'').squish)
         details.merge!("rating".to_sym => sub_page.search('.ratings-section .line .pp-big-star').text())
-        puts details
         details
       end
 
