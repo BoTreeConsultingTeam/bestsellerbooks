@@ -88,7 +88,7 @@ module Utilities
         details.merge!("category".to_sym => category)
         details.merge!("rating_count".to_sym => sub_page.search('#acr .acrCount .noTextDecoration').text().gsub(/\D/,''))
         details.merge!("rating".to_sym => sub_page.search('.jumpBar .asinReviewsSummary .swSprite span').text().strip.gsub(/ out of 5 stars/,'').strip.gsub(/See all reviews/,''))
-        details.merge!("price".to_sym => sub_page.search('#actualPriceValue b span').text().strip.gsub(/\D/,'').squish[0..-3])
+        details.merge!("price".to_sym => sub_page.search('#actualPriceValue b span').text().strip.gsub(/\D/,'')[0..-3])
         details
       end
 

@@ -71,17 +71,17 @@ module Utilities
       def self.collect
         unique_books_details = {}
 
-        amazon = get_main_page_scrapper(:amazon)
-        unique_books_details = amazon.crawl(unique_books_details)
+        # amazon = get_main_page_scrapper(:amazon)
+        # unique_books_details = amazon.crawl(unique_books_details)
 
-        flipkart = get_main_page_scrapper(:flipkart)
-        unique_books_details = flipkart.crawl(unique_books_details)
+        # flipkart = get_main_page_scrapper(:flipkart)
+        # unique_books_details = flipkart.crawl(unique_books_details)
 
-        landmark = get_main_page_scrapper(:landmark)
-        unique_books_details = landmark.crawl(unique_books_details)
+        # landmark = get_main_page_scrapper(:landmark)
+        # unique_books_details = landmark.crawl(unique_books_details)
 
-        crossword = get_main_page_scrapper(:crossword)
-        unique_books_details = crossword.crawl(unique_books_details)
+        # crossword = get_main_page_scrapper(:crossword)
+        # unique_books_details = crossword.crawl(unique_books_details)
 
         uread = get_main_page_scrapper(:uread)
         unique_books_details = uread.crawl(unique_books_details)

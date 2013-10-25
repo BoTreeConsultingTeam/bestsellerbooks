@@ -39,7 +39,6 @@ module Utilities
                 language: nil,
                 publisher: meta[:publisher],
                 description: meta[:description],
-                description: meta[:description],
                 book_meta_data: { "#{site_id[:id]}" => { price: meta[:price], rating_count: meta[:rating_count], rating: meta[:rating],
                  delivery_days: meta[:meta], discount: meta[:discount], book_detail_url: href_url }}
               }} 

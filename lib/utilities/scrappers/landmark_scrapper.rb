@@ -11,7 +11,7 @@ module Utilities
       def process_page
         puts "Started crawling LandmarkOnline....."
         unless page.nil?
-          li = page.search('#main-column section.productblock article.product')[1..4]
+          li = page.search('#main-column section.productblock article.product')
           site_id = Site.find_by_name("landmarkonthenet")
           li.each_with_index do |li_item, index|
             title = li_item.search('.info h1 a').attr('title').text().squish.strip
