@@ -29,7 +29,7 @@ module Utilities
                 description: meta[:description],
                 category: meta[:category],
                 book_meta_data: { "#{site_id[:id]}" => { price: meta[:price], discount: meta[:discount],
-                  delivery_days: meta[:meta], book_detail_url: href_url }}
+                  delivery_days: meta[:delivery_days], book_detail_url: href_url }}
               }}
               add_book_details(li_map)
             end
