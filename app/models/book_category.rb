@@ -1,4 +1,5 @@
 class BookCategory < ActiveRecord::Base
+  default_scope order(:category_name)
   attr_accessible :category_name
   
   has_many :category_details, dependent: :destroy
