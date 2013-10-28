@@ -40,7 +40,7 @@ module Utilities
           end
         end
         puts "Crawling Amazon Completed....."
-        puts "#{books_index}...book fetched from Amazon"
+        puts "#{books_index}...books fetched from Amazon"
       end
 
       def process_sub_page(href_url)
@@ -78,7 +78,7 @@ module Utilities
           details.merge!("discount".to_sym => nil)
         end
         begin
-          details.merge!("delivery_days".to_sym => sub_page.search('#deliveryMessage b').text().squish.strip)
+          details.merge!("delivery_days".to_sym => sub_page.search("span[id='deliveryMessage'] b").text().squish.strip)
         rescue Exception => e
           details.merge!("delivery_days".to_sym => nil)
         end

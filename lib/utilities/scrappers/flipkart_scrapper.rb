@@ -38,7 +38,7 @@ module Utilities
           end
         end
         puts "Crawling Flipkart Completed....."
-        puts "#{books_index}...book fetched from Flipkart"
+        puts "#{books_index}...books fetched from Flipkart"
       end
 
       def process_sub_page(href_url)

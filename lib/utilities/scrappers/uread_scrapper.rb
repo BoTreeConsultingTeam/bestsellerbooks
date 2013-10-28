@@ -16,7 +16,11 @@ module Utilities
           site_id = Site.find_by_name("uread")
           li.each do |li_item|
             title = li_item.search('.product-summary .title a').text().squish.strip
-            author = li_item.search('.product-summary .author-publisher a')[0].text().squish.strip
+            begin
+              author = li_item.search('.product-summary .author-publisher a')[0].text().squish.strip
+            rescue Exception => e
+              author = nil
+            end
             begin
               publisher = li_item.search('.product-summary .author-publisher a')[1].text().squish.strip
             rescue Exception => e
@@ -49,7 +53,7 @@ module Utilities
           end
         end
         puts "Crawling Uread Completed....."
-        puts "#{books_index}...book fetched from Uread"
+        puts "#{books_index}...books fetched from Uread"
       end
 
       def self.process_sub_page(sub_page)

@@ -8,7 +8,7 @@ class BookDetail < ActiveRecord::Base
   
   scope :find_book_with_id, lambda { |book_details_id| where(id: book_details_id) }
   scope :find_book_with_isbn,  lambda { |book_details_isbn| where(isbn: book_details_isbn) }
-  scope :search_books_details,  lambda { |detail, page| where("author ilike '%#{detail}%' or isbn = '%#{detail}%' or title ilike '%#{detail}%' or publisher ilike '%#{detail}%' or language ilike '%#{detail}%'").order('occurrence DESC').order('average_rating DESC').page(page).per(12) }
+  scope :search_books_details,  lambda { |detail, page| where("author ilike '%#{detail}%' or isbn ilike '%#{detail}%' or title ilike '%#{detail}%' or publisher ilike '%#{detail}%' or language ilike '%#{detail}%'").order('occurrence DESC', 'average_rating DESC').page(page).per(12) }
   scope :book_author, pluck([:author])
   scope :book_title, pluck([:title])
 
@@ -125,8 +125,10 @@ class BookDetail < ActiveRecord::Base
     category_from_site.each do |category|
       sub_category = category.gsub(/\&/,"").split
       sub_category.each do |category|
-        category = BookCategory.where("category_name ilike '%#{category.gsub(/'s/,'')}%'")
-        book_details.book_categorys << category unless category.nil?
+        if category.length > 3
+          category = BookCategory.where("category_name ilike '%#{category.gsub(/'s/,'')}%'")
+          book_details.book_categorys << category unless category.nil?
+        end
       end
     end
   end
@@ -145,7 +147,7 @@ class BookDetail < ActiveRecord::Base
   end
 
   def self.show_books_details(page)
-  	self.order('occurrence DESC').order('average_rating DESC').page(page).per(12)
+  	self.order('occurrence DESC', 'average_rating DESC').page(page).per(12)
   end
 
   def self.refresh_books_detail!(fresh_list_of_books_details)

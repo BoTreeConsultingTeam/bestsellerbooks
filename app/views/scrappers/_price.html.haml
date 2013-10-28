@@ -19,13 +19,13 @@
 				= @show_book_details[:isbn]
 			%dt{style: "text-align: left; width: 100px;"} Publisher :
 			%dd
-				- if @show_book_details[:publisher].nil?
+				- if @show_book_details[:publisher].blank?
 					= "-"
 				- else
 					= @show_book_details[:publisher]
 			%dt{style: "text-align: left; width: 100px;"} Language :
 			%dd
-				- if @show_book_details[:language].nil?
+				- if @show_book_details[:language].blank?
 					= "-"
 				- else
 					= @show_book_details[:language]

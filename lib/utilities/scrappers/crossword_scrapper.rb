@@ -38,7 +38,7 @@ module Utilities
           end
         end
         puts "Crawling Crossword Completed....."
-        puts "#{books_index}...book fetched from Crossword"
+        puts "#{books_index}...books fetched from Crossword"
       end
 
       def process_sub_page(href_url)

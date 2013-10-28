@@ -18,7 +18,7 @@ module Utilities
           li = page.search('#bestSellerResultsDiv .books-list-item')
           li.each_with_index do |li_item, index|
             title = li_item.search('.listView_details .listView_title a').attr('title').text().squish.strip
-            img_url = li_item.search('.listView_image a img').attr('src').text()
+            img_url = li_item.search('.listView_image a img').attr('data-original').text()
             href_url = 'http://www.homeshop18.com' + li_item.search('.listView_image a').attr('href').text().squish.strip
             meta = process_sub_page(href_url)
             unless meta.empty? || meta[:isbn].nil?
@@ -39,7 +39,7 @@ module Utilities
           end
         end
         puts "Crawling Homeshop18 Completed....."
-        puts "#{books_index}...book fetched from Homeshop18"
+        puts "#{books_index}...books fetched from Homeshop18"
       end
 
       def process_sub_page(href_url)

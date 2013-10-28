@@ -38,7 +38,7 @@ module Utilities
           end
         end
         puts "Crawling LandmarkOnline completed....."
-        puts "#{books_index}...book fetched from LandmarkOnline"
+        puts "#{books_index}...books fetched from LandmarkOnline"
       end
       
       def process_sub_page(href_url)

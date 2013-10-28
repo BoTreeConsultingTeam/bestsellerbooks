@@ -14,10 +14,16 @@
                     %img{:alt => "", :src => "#{book_data[:images]}", style: "height: 140px;"}
                   %p
                     %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
-                      = label_tag book_data[:title], nil, class: 'bold', style: "font-size: 16px" 
+                      -if book_data[:title].length < 50
+                        = label_tag book_data[:title], nil, class: 'bold', style: "font-size: 16px" 
+                      - else
+                        = label_tag "#{book_data[:title][1..52]}...", nil, class: 'bold', style: "font-size: 16px" 
                   %p.book_author
                     %strong By:
-                    = book_data[:author]
+                    -if book_data[:author].nil?
+                      - "-"
+                    -else
+                      = book_data[:author]
                   %p
                     - min_price = BookDetail.book_price(book_data).first
                     %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank"}
