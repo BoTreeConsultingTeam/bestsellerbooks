@@ -12,7 +12,6 @@ class ScrappersController < ApplicationController
     unless params[:search].nil?
       params[:search] = params[:search].gsub("'","''")
     end
-    puts params[:search]
     @data = BookDetail.search_books_details(params[:search], params[:page])
     @book_category = BookCategory.all
     respond_to do |format|

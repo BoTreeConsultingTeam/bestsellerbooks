@@ -127,7 +127,7 @@ class BookDetail < ActiveRecord::Base
       sub_category.each do |category|
         if category.length > 3
           category = BookCategory.where("category_name ilike '%#{category.gsub(/'s/,'')}%'")
-          book_details.book_categorys << category unless category.nil?
+          book_details.book_categories << category unless category.nil?
         end
       end
     end

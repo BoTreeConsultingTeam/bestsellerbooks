@@ -20,17 +20,13 @@
                         = label_tag "#{book_data[:title][1..52]}...", nil, class: 'bold', style: "font-size: 16px" 
                   %p.book_author
                     %strong By:
-                    -if book_data[:author].nil?
-                      - "-"
-                    -else
-                      = book_data[:author]
+                    = book_data[:author].presence || ''
                   %p
                     - min_price = BookDetail.book_price(book_data).first
                     %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank"}
                       %strong
-                        %a.initialism{title: "buy @#{min_price.site[:name]}"}
+                        %a{title: "Buy from #{min_price.site[:name]}"}
                           = "Best Buy ₹ #{min_price[:price]}"
-                          = hidden_field_tag "min_price_site_name", min_price.site[:name]
     - else
       %p
         %p
