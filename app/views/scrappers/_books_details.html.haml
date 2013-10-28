@@ -3,24 +3,23 @@
     - unless @data.nil?
       = paginate @data, :params => {:action => paginate_action}, remote: true
   .span10
-    -#= link_to "refresh", refresh_details_path
     - if !@data.nil?
       - @data.each_slice(4).to_a.each do |row|
         .row-fluid
           %ul.thumbnails
-            -row.each do |item|
+            -row.each do |book_data|
               %li.span3.text-center
                 .thumbnail
-                  %a{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
-                    %img{:alt => "", :src => "#{item[:images]}", style: "height: 140px;"}
+                  %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
+                    %img{:alt => "", :src => "#{book_data[:images]}", style: "height: 140px;"}
                   %p
-                    %a{:href => "#{price_details_path(item[:id])}", "data-remote" => true}
-                      = label_tag item[:title], nil, class: 'bold', style: "font-size: 16px" 
+                    %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
+                      = label_tag book_data[:title], nil, class: 'bold', style: "font-size: 16px" 
                   %p.book_author
                     %strong By:
-                    =item[:author]
+                    = book_data[:author]
                   %p
-                    - min_price = BookDetail.book_price(item).first
+                    - min_price = BookDetail.book_price(book_data).first
                     %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank"}
                       %strong
                         %a.initialism{title: "buy @#{min_price.site[:name]}"}

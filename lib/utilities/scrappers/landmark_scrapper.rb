@@ -9,6 +9,7 @@ module Utilities
       end
 
       def process_page
+        books_index = 0
         puts "Started crawling LandmarkOnline....."
         unless page.nil?
           li = page.search('#main-column section.productblock article.product')
@@ -19,7 +20,7 @@ module Utilities
             img_url = li_item.search('.image a img').attr('src').text()
             href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text()
             meta = process_sub_page(href_url)
-            unless meta.nil?
+            unless meta.nil? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
                 author: author,
@@ -32,10 +33,12 @@ module Utilities
                   delivery_days: meta[:delivery_days], book_detail_url: href_url }}
               }}
               add_book_details(li_map)
+              books_index = books_index + 1
             end
           end
         end
         puts "Crawling LandmarkOnline completed....."
+        puts "#{books_index}...book fetched from LandmarkOnline"
       end
       
       def process_sub_page(href_url)
@@ -53,11 +56,7 @@ module Utilities
               details.merge!("language".to_sym => language.gsub(/\W/,''))  
             end          
           end
-          # a = sub_page.search('#product-breadcrumbs li a')
-          # category = []
-          # a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
-          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          # details.merge!("category".to_sym => category)
+          details.merge!("description" => sub_page.search('#tabwrapper section[data-title="Description"] p').to_s)
           book_data = LandmarkScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
         end

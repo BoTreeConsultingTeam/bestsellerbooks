@@ -9,6 +9,7 @@ module Utilities
       end
 
       def process_page
+        books_index = 0
         puts "Started Crawling Crossword....."
         unless page.nil?
           li = page.search('#content-slot ul li.clearfix')
@@ -16,11 +17,10 @@ module Utilities
           li.each_with_index do |li_item, index|
             title = li_item.search('.variant-title a').attr('title').text().squish.strip
             author = li_item.search('.contributors .ctbr-name a').text().squish.strip
-            price = li_item.search('.variant-desc .price .variant-final-price').text().strip!
             img_url = li_item.search('.variant-image a img').attr('src').text()
             href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text()
             meta = process_sub_page(href_url)
-            unless meta.empty?
+            unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
                 author: author,
@@ -29,14 +29,16 @@ module Utilities
                 publisher: meta[:publisher],
                 description: meta[:description],
                 category: meta[:category],
-                book_meta_data: { "#{site_id[:id]}" => { rating: meta[:rating], price: price.gsub(/\D/,''), discount: meta[:discount], 
+                book_meta_data: { "#{site_id[:id]}" => { rating: meta[:rating], price: meta[:price], discount: meta[:discount], 
                   delivery_days: meta[:delivery_days], rating_count: meta[:rating_count], book_detail_url: href_url }}
               }}
               add_book_details(li_map)
+              books_index = books_index + 1
             end
           end
         end
         puts "Crawling Crossword Completed....."
+        puts "#{books_index}...book fetched from Crossword"
       end
 
       def process_sub_page(href_url)
@@ -53,13 +55,6 @@ module Utilities
               details.merge!("language".to_sym => language.gsub(/\W/,''))
             end
           end
-          # category= []
-          # a = sub_page.search('#browse_nodes_bc li.clearfix a')
-          # a.each_with_index { |a_item, index|
-          #   category << a_item.text().squish.gsub(/\n/, '').strip
-          # }
-          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          # details.merge!("category".to_sym => category)
           details.merge!("description".to_sym => sub_page.search('#description p').to_s)
           book_data = CrosswordScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
@@ -76,7 +71,7 @@ module Utilities
               details.merge!("isbn".to_sym => li_item.text().strip.gsub(/\D/,''))
             end
           end
-          category= []
+          category = []
           a = sub_page.search('#browse_nodes_bc li.clearfix a')
           a.each_with_index { |a_item, index|
             category << a_item.text().squish.gsub(/\n/, '').strip
@@ -95,6 +90,7 @@ module Utilities
           details.merge!("discount".to_sym => sub_page.search('#pricing_summary .discount_gola').text().gsub(/\D/,''))
           details.merge!("rating".to_sym => rating)
           details.merge!("rating_count".to_sym => rating_count)
+          details.merge!("price".to_sym => sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,''))
         end
         details
       end

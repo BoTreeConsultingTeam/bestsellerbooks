@@ -9,6 +9,7 @@ module Utilities
       end
 
       def process_page
+        books_index = 0
         puts "Started Crawling Flipkart....."
         unless page.nil?
           li = page.search('#search_results .fk-srch-item')
@@ -19,7 +20,7 @@ module Utilities
             img_url = li_item.search('.fk-sitem-image-section .rposition a img').attr('data-src').text()
             href_url = 'http://www.flipkart.com' + li_item.search('.fk-sitem-image-section a').attr('href').text()
             meta = process_sub_page(href_url)
-            unless meta.empty?
+            unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
                 author: meta[:author],
@@ -32,10 +33,12 @@ module Utilities
                   rating_count: meta[:rating_count], book_detail_url: href_url }}
               }}
               add_book_details(li_map)
+              books_index = books_index + 1
             end
           end
         end
         puts "Crawling Flipkart Completed....."
+        puts "#{books_index}...book fetched from Flipkart"
       end
 
       def process_sub_page(href_url)
@@ -54,11 +57,6 @@ module Utilities
               details.merge!("author".to_sym => td_items.search('.specs-value a').text())
             end
           end
-          # category = []
-          # a = sub_page.search('#fk-mainbody-id .fk-lbreadbcrumb span a')
-          # a.each_with_index { |a_item, index| category << a_item.text().squish.gsub(/\n/, '').strip }
-          # category.delete_if { |sub_category| sub_category == "Books" || sub_category == "Home" }
-          # details.merge!("category".to_sym => category)
           details.merge!("description".to_sym => sub_page.search('#description .item_desc_text p').to_s)
           book_data = FlipkartScrapper.process_book_data_page(sub_page)
           details.merge!(book_data)

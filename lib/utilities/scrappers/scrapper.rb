@@ -50,6 +50,10 @@ module Utilities
             Utilities::Scrappers::CrosswordScrapper.new
           when :uread
             Utilities::Scrappers::UreadScrapper.new
+          when :homeshop18
+            Utilities::Scrappers::Homeshop18Scrapper.new
+          when :indiatimes
+            Utilities::Scrappers::IndiatimesScrapper.new
         end
       end
 
@@ -65,6 +69,10 @@ module Utilities
             Utilities::Scrappers::CrosswordSearchBookScrapper.new(site_url)
           when :uread
             Utilities::Scrappers::UreadSearchBookScrapper.new(site_url)
+          when :homeshop18
+            Utilities::Scrappers::Homeshop18SearchBookScrapper.new(site_url)
+          when :indiatimes
+            Utilities::Scrappers::IndiatimesSearchBookScrapper.new(site_url)
         end
       end
 
@@ -85,6 +93,12 @@ module Utilities
 
         uread = get_main_page_scrapper(:uread)
         unique_books_details = uread.crawl(unique_books_details)
+
+        homeshop18 = get_main_page_scrapper(:homeshop18)
+        unique_books_details = homeshop18.crawl(unique_books_details)
+
+        indiatimes = get_main_page_scrapper(:indiatimes)
+        unique_books_details = indiatimes.crawl(unique_books_details)
       end
     end
 

@@ -9,6 +9,7 @@ module Utilities
       end
 
       def process_page
+        books_index = 0
         puts "Started Crawling Amazon....."
         unless page.nil?
           li = page.search('#zg .zg_itemImmersion')
@@ -20,7 +21,7 @@ module Utilities
             href_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a').attr('href').text()
             rating = li_item.search('.zg_itemWrapper .zg_reviews .swSprite span').text().strip.gsub(/ out of 5 stars/,'')
             meta = process_sub_page(href_url)
-            unless meta.empty?
+            unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {
                 img: img_url,
                 author: author,
@@ -34,10 +35,12 @@ module Utilities
                  delivery_days: meta[:delivery_days], discount: meta[:discount], book_detail_url: href_url }}
               }}          
               add_book_details(li_map)
+              books_index = books_index + 1
             end
           end
         end
         puts "Crawling Amazon Completed....."
+        puts "#{books_index}...book fetched from Amazon"
       end
 
       def process_sub_page(href_url)

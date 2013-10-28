@@ -12,6 +12,12 @@ $(document).ready(function(){
           color: '#fff' 
       } }); 
 	});
+  // $('.thumbnails').
+  // $('.avg_star').raty({ 
+  //   readOnly: true, 
+  //   score: $(this).attr('value'),
+  //   number: 5
+  // });
 
   $("a.category_link").on("click",
     function(event) {

@@ -1,5 +1,6 @@
 	Site.create!([
-		{ name: "amazon" },{ name: "crossword" },{ name: "flipkart" },{ name: "landmarkonthenet" },{ name: "uread" }
+		{ name: "amazon" },{ name: "crossword" },{ name: "flipkart" },{ name: "landmarkonthenet" },{ name: "uread" },
+		{ name: "homeshop18" },{ name: "indiatimes" }
 	])
 	BookCategory.create!([
 		{ category_name: "Biographies & Autobiographies" },

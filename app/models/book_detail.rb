@@ -19,7 +19,7 @@ class BookDetail < ActiveRecord::Base
       average_rating = meta[0]
       occurrence = meta[1]
       book_details = self.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description], average_rating: average_rating, occurrence: occurrence)
-      unless book_details.persisted?
+      unless book_details.persisted? 
         site_id = []
         book_details.save
         book_meta_data = []
@@ -34,14 +34,13 @@ class BookDetail < ActiveRecord::Base
       end
     end
   end
+
   def self.calculate_rating_avg(book_meta_data)
     site_id = Site::ALL_SITE_IDS
     rating = []
     rating_count = []
-    index = 0
     site_id.each do |site|
       if book_meta_data.key?("#{site}")
-        index = index + 1
         data = book_meta_data["#{site}"]
         rating << (data[:rating].to_f * data[:rating_count].to_i)
         rating_count << data[:rating_count].to_i
@@ -56,6 +55,7 @@ class BookDetail < ActiveRecord::Base
     meta = [avg, rating_count.count]
     meta
   end
+  
   def self.create_book_meta(book_details, book_data)
     book_data.each do |meta|
       book_details.book_metas.create!(rating_count: meta[:rating_count], delivery_days: meta[:delivery_days], site_id: meta[:site_id], book_detail_url: meta[:book_detail_url], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
@@ -67,33 +67,42 @@ class BookDetail < ActiveRecord::Base
     book_data = []
     Site.where(id: remain_site).each do |site|
       logger.debug "Processing #{site[:name]} for prices....."
-      if site[:name] == "crossword"
-        url = "http://www.crossword.in/books/search?q=" + isbn
-        crossword = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:crossword, url)
-        book_data = self.process_search_book_data(crossword, isbn, site[:id], book_data, url)
-      elsif site[:name] == "flipkart"
-        url = "http://www.flipkart.com/search?q=" + isbn
-        flipkart = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:flipkart, url)
-        book_data = self.process_search_book_data(flipkart, isbn, site[:id], book_data, url)
-      elsif site[:name] == "amazon"
-        url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
-        amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
-        book_data = self.process_search_book_data(amazon, isbn, site[:id], book_data, url)
-      elsif site[:name] == "landmarkonthenet"
-        url = "http://www.landmarkonthenet.com/search/?q=" + isbn
-        landmarkonthenet = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:landmark, url)
-        book_data = self.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url)
-      elsif site[:name] == "uread"
-        url = "http://www.uread.com/search-books/" + isbn
-        uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:uread, url)
-        book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url)
+      case site[:name]
+        when "crossword"
+          url = "http://www.crossword.in/books/search?q=" + isbn
+          crossword = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:crossword, url)
+          book_data = self.process_search_book_data(crossword, isbn, site[:id], book_data, url, book_details)
+        when "flipkart"
+          url = "http://www.flipkart.com/search?q=" + isbn
+          flipkart = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:flipkart, url)
+          book_data = self.process_search_book_data(flipkart, isbn, site[:id], book_data, url, book_details)
+        when "amazon"
+          url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
+          amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
+          book_data = self.process_search_book_data(amazon, isbn, site[:id], book_data, url, book_details)
+        when "landmarkonthenet"
+          url = "http://www.landmarkonthenet.com/search/?q=" + isbn
+          landmarkonthenet = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:landmark, url)
+          book_data = self.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url, book_details)
+        when "uread"
+          url = "http://www.uread.com/search-books/" + isbn
+          uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:uread, url)
+          book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url, book_details)
+        when "homeshop18"
+          url = "http://www.homeshop18.com/search:" + isbn
+          uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:homeshop18, url)
+          book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url, book_details)
+        when "indiatimes"
+          url = "http://shopping.indiatimes.com/mtkeywordsearch?SEARCH_STRING=" + isbn + "&catalog=10011"
+          uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:indiatimes, url)
+          book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url, book_details)
       end
     end
     logger.debug "#{book_data}"
     self.create_book_meta(book_details, book_data)
   end
 
-  def self.process_search_book_data(site_data, isbn, site_ids, all_book_data, url)
+  def self.process_search_book_data(site_data, isbn, site_ids, all_book_data, url, book)
     unless site_data.nil?
       site_data.process_page
       book_data = site_data.book_details
@@ -103,6 +112,8 @@ class BookDetail < ActiveRecord::Base
         end
         if !book_detail.empty? && !book_detail[:price].nil? && book_detail[:isbn] == isbn
           book_detail.merge!("site_id".to_sym => site_ids)
+          category = book_detail[:category]
+          create_category_details(category, book) unless category.nil?
           all_book_data << book_detail
         end
       end
@@ -113,8 +124,8 @@ class BookDetail < ActiveRecord::Base
   def self.create_category_details(category_from_site, book_details)
     category_from_site.each do |category|
       sub_category = category.gsub(/\&/,"").split
-      sub_category.each do |n|
-        category = BookCategory.where("category_name ilike '%#{n.gsub(/'s/,'')}%'")
+      sub_category.each do |category|
+        category = BookCategory.where("category_name ilike '%#{category.gsub(/'s/,'')}%'")
         book_details.book_categorys << category unless category.nil?
       end
     end
@@ -143,23 +154,34 @@ class BookDetail < ActiveRecord::Base
     database_books_details_isbn.each { |isbn|
       existing_books.merge!(isbn => isbn)
     }
+    destroy_books_index = 0
+    create_book_metas_index = 0
+    update_book_metas_index = 0
     existing_books.each do |isbn_key, value|
       if fresh_list_of_books_details.key?(isbn_key)
         book_meta_data = fresh_list_of_books_details[isbn_key][:book_meta_data]
+        meta = self.calculate_rating_avg(book_meta_data)
         book_details = self.find_book_with_isbn(isbn_key).first
         book_meta_data.each do |site_id_key, meta|
           old_price_list = book_details.book_metas.site_id(site_id_key).first
           if old_price_list.nil?
             meta.merge!(site_id: site_id_key)
             book_details.book_metas.create!(meta)
+            create_book_metas_index = create_book_metas_index + 1
           else
             old_price_list.update_attributes(price: meta[:price], discount: meta[:discount], rating: meta[:rating])
+            update_book_metas_index = update_book_metas_index + 1
           end
         end
+        book_details.update_attributes(average_rating: meta[0], occurrence: meta[1])
       else
         self.find_book_with_isbn(isbn_key).first.destroy
+        destroy_books_index = destroy_books_index + 1
       end
     end
+    puts "#{destroy_books_index}...books deleted"
+    puts "#{create_book_metas_index}...book meta created"
+    puts "#{update_book_metas_index}...book data updated"
   end
 
   def self.filter_books!(books_details, unique_books_details)
