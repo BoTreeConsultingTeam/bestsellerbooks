@@ -3,7 +3,7 @@ class BookDetail < ActiveRecord::Base
   validates :isbn, presence: true
 
   has_many :category_details, dependent: :destroy
-  has_many :book_categorys, through: :category_details
+  has_many :book_categories, through: :category_details
   has_many :book_metas, dependent: :destroy
   
   scope :find_book_with_id, lambda { |book_details_id| where(id: book_details_id) }
