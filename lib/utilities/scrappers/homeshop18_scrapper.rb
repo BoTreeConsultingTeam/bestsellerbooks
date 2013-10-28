@@ -1,5 +1,3 @@
-require 'iconv'
-
 module Utilities
   module Scrappers
     class Homeshop18Scrapper < Scrapper
@@ -57,7 +55,7 @@ module Utilities
             end
           end
           description = sub_page.search('.description-section .product_dscrpt_product_summary_area .product_dscrpt_summarytxt_box').to_s
-          description = Iconv.conv("UTF-8//IGNORE", "US-ASCII", description)
+          description = description.encode("UTF-8", :invalid => :replace, :undef => :replace, :replace => "?")
           details.merge!("description".to_sym => description)
           book_data = Homeshop18Scrapper.process_book_data_page(sub_page)
           details.merge!(book_data)
