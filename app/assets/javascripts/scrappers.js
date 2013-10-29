@@ -1,5 +1,4 @@
 $(document).ready(function(){
-  var a = "#{@show_book_details.book_price[:crossword_price]}"
   $("#search-ajax").on("click",
     function(event) {
       $.blockUI({ css: { 
@@ -12,12 +11,6 @@ $(document).ready(function(){
           color: '#fff' 
       } }); 
 	});
-  // $('.thumbnails').
-  // $('.avg_star').raty({ 
-  //   readOnly: true, 
-  //   score: $(this).attr('value'),
-  //   number: 5
-  // });
 
   $("a.category_link").on("click",
     function(event) {

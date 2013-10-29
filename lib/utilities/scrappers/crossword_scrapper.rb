@@ -15,9 +15,9 @@ module Utilities
           li = page.search('#content-slot ul li.clearfix')
           site_id = Site.find_by_name("crossword")
           li.each_with_index do |li_item, index|
-            title = li_item.search('.variant-title a').attr('title').text().squish.strip
             author = li_item.search('.contributors .ctbr-name a').text().squish.strip
             img_url = li_item.search('.variant-image a img').attr('src').text()
+            title = li_item.search('.variant-image a img').attr('title').text()
             href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text()
             meta = process_sub_page(href_url)
             unless meta.empty? || meta[:isbn].nil?
@@ -90,6 +90,10 @@ module Utilities
           details.merge!("discount".to_sym => sub_page.search('#pricing_summary .discount_gola').text().gsub(/\D/,''))
           details.merge!("rating".to_sym => rating)
           details.merge!("rating_count".to_sym => rating_count)
+          price = sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,'')
+          if price.nil?
+            price = sub_page.search('#pricing_summary .list_price ').text().gsub(/\D/,'')
+          end
           details.merge!("price".to_sym => sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,''))
         end
         details

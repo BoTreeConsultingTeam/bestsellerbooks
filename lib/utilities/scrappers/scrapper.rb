@@ -100,7 +100,7 @@ module Utilities
         indiatimes = get_main_page_scrapper(:indiatimes)
         unique_books_details = indiatimes.crawl(unique_books_details)
       end
+      
     end
-
   end
 end

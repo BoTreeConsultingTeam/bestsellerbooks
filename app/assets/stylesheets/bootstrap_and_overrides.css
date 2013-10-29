@@ -20,3 +20,7 @@
 abbr[title], abbr[data-original-title] {
     border-bottom: medium none;
 }
+.book_title {
+	font-size: 16px;
+	height: 41px;
+}

@@ -4,8 +4,7 @@ class ScrappersController < ApplicationController
   def price_details
     @show_book_details = BookDetail.find_book_with_id(params[:format]).first
     @price_list = BookDetail.book_price(@show_book_details)
-    @avg_rating = BookDetail.avg_rating(@show_book_details)
-    @category_details = @show_book_details.book_categories
+    @category_details = @show_book_details.book_categories.uniq
   end
 
   def show
@@ -32,10 +31,13 @@ class ScrappersController < ApplicationController
   def find_book_price
     book_details = BookDetail.find_by_isbn("#{params[:isbn].squish}")
     sites_ids = book_details.book_metas.pluck(:site_id)
-    BookDetail.find_book_meta(book_details, "#{params[:isbn].squish}", sites_ids)
+    remain_site = Site::ALL_SITE_IDS - sites_ids
+    book_data = BookDetail.find_book_meta(book_details, "#{params[:isbn].squish}", remain_site)
+    BookDetail.create_book_meta(book_details, book_data)
+    BookDetail.update_average_rating(book_data, book_details)
     @new_price_list = BookDetail.book_price(book_details)
-    @new_avg_rating = BookDetail.avg_rating(book_details)
-    @new_category_details = book_details.book_categories
+    @new_avg_rating = book_details[:average_rating]
+    @new_category_details = book_details.book_categories.uniq
   end
 
   def show_latest_books

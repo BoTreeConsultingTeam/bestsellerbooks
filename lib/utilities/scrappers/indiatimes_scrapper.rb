@@ -15,7 +15,7 @@ module Utilities
           li = page.search('.productcoloumn')
           site_id = Site.find_by_name("indiatimes")
           li.each_with_index do |li_item, index|
-            title = li_item.search('.productdetail a')  .text().squish.strip
+            title = li_item.search('.productdetail a').text().squish.strip
             author = li_item.search('.productdetail h3').text().squish.strip
             img_url = li_item.search('.productthumb a.listproductthumb img').attr('data-original').text()
             img_url = "http:" + img_url if img_url.match('http'||'https').nil?

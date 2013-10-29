@@ -15,22 +15,42 @@ class BookDetail < ActiveRecord::Base
   def self.create_or_find_book_details!(books)
     refresh_books_detail!(books)
     books.each do |key, value|
-      meta = self.calculate_rating_avg(books[key][:book_meta_data])
-      average_rating = meta[0]
-      occurrence = meta[1]
-      book_details = self.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description], average_rating: average_rating, occurrence: occurrence)
-      unless book_details.persisted? 
-        site_id = []
-        book_details.save
-        book_meta_data = []
-        value[:book_meta_data].each do |site_key, book_detail_value|
-          site_id << site_key.to_i
-          book_detail_value.merge!(site_id: site_key)
-          book_meta_data << book_detail_value
-          create_category_details(value[:category], book_details) if !value[:category].nil?
+      begin
+        meta = self.calculate_rating_avg(books[key][:book_meta_data])
+        book_details = self.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description], average_rating: meta[0], occurrence: meta[1])
+        unless book_details.persisted? 
+          site_id = []
+          book_details.save
+          book_meta_data = []
+          value[:book_meta_data].each do |site_key, book_detail_value|
+            site_id << site_key.to_i
+            book_detail_value.merge!(site_id: site_key)
+            book_meta_data << book_detail_value
+            create_category_details(value[:category], book_details) if !value[:category].nil?
+          end
+          isbn = book_details[:isbn]
+          create_book_meta(book_details, book_meta_data)
         end
-        isbn = book_details[:isbn]
-        create_book_meta(book_details, book_meta_data)
+      rescue Exception => e
+        logger.debug "In...#{key}...book isbn...error occured"
+        logger.debug "Book data of...#{key}...#{value}"
+      end
+    end
+  end
+
+  def self.update_average_rating(book_data, book_details)
+    unless book_data.nil?
+      hash = {}
+      book_data.each do |data|
+        hash.merge!("#{data[:site_id]}" => data)
+      end
+      meta = BookDetail.calculate_rating_avg(hash)
+      average_rating = book_details[:average_rating]
+      if !meta[0].nil? && average_rating.nil?
+        book_details.update_attributes(average_rating: meta[0])
+      elsif !average_rating.nil? && !meta[0].nil?
+        average_rating = (average_rating.to_f + meta[0].to_f) / 2
+        book_details.update_attributes(average_rating: average_rating)
       end
     end
   end
@@ -58,12 +78,16 @@ class BookDetail < ActiveRecord::Base
   
   def self.create_book_meta(book_details, book_data)
     book_data.each do |meta|
-      book_details.book_metas.create!(rating_count: meta[:rating_count], delivery_days: meta[:delivery_days], site_id: meta[:site_id], book_detail_url: meta[:book_detail_url], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
+      begin
+        book_details.book_metas.create!(rating_count: meta[:rating_count], delivery_days: meta[:delivery_days], site_id: meta[:site_id], book_detail_url: meta[:book_detail_url], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
+      rescue Exception => e
+        logger.debug "book id...#{book_details.id}...isbn...#{book_details.isbn}"
+        logger.debug "Error occured while creating book meta of ...#{meta}"
+      end
     end
   end
   
-  def self.find_book_meta(book_details, isbn, existing_site_ids)
-    remain_site = Site::ALL_SITE_IDS - existing_site_ids
+  def self.find_book_meta(book_details, isbn, remain_site)
     book_data = []
     Site.where(id: remain_site).each do |site|
       logger.debug "Processing #{site[:name]} for prices....."
@@ -99,7 +123,7 @@ class BookDetail < ActiveRecord::Base
       end
     end
     logger.debug "#{book_data}"
-    self.create_book_meta(book_details, book_data)
+    book_data
   end
 
   def self.process_search_book_data(site_data, isbn, site_ids, all_book_data, url, book)
@@ -122,8 +146,8 @@ class BookDetail < ActiveRecord::Base
   end
 
   def self.create_category_details(category_from_site, book_details)
-    category_from_site.each do |category|
-      sub_category = category.gsub(/\&/,"").split
+    category_from_site.each do |categorys|
+      sub_category = categorys.gsub(/\&/,"").split
       sub_category.each do |category|
         if category.length > 3
           category = BookCategory.where("category_name ilike '%#{category.gsub(/'s/,'')}%'")
@@ -131,19 +155,6 @@ class BookDetail < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def self.avg_rating(book)
-    all_rating = book.book_metas.pluck(:rating).compact
-    avg_rating = !all_rating.empty? ? (all_rating.sum) / all_rating.count : nil
-    avg_rating 
-  end
-
-  def self.avg_rating_with_user(book)
-    all_rating = book.book_metas.pluck(:rating).compact
-    rating_count = book.book_metas.pluck(:rating_count).compact
-    avg_rating = !all_rating.empty? ? (all_rating.sum) / (rating_count.sum) : nil
-    avg_rating 
   end
 
   def self.show_books_details(page)
@@ -162,20 +173,28 @@ class BookDetail < ActiveRecord::Base
     existing_books.each do |isbn_key, value|
       if fresh_list_of_books_details.key?(isbn_key)
         book_meta_data = fresh_list_of_books_details[isbn_key][:book_meta_data]
-        meta = self.calculate_rating_avg(book_meta_data)
         book_details = self.find_book_with_isbn(isbn_key).first
+        all_site_id_in_meta_data = book_details.book_metas.pluck(:site_id)
+        site_id_new_list = []
         book_meta_data.each do |site_id_key, meta|
+          site_id_new_list << site_id_key.to_i
           old_price_list = book_details.book_metas.site_id(site_id_key).first
           if old_price_list.nil?
             meta.merge!(site_id: site_id_key)
             book_details.book_metas.create!(meta)
             create_book_metas_index = create_book_metas_index + 1
           else
-            old_price_list.update_attributes(price: meta[:price], discount: meta[:discount], rating: meta[:rating])
+            old_price_list.update_attributes(rating_count: meta[:rating_count], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
             update_book_metas_index = update_book_metas_index + 1
           end
         end
-        book_details.update_attributes(average_rating: meta[0], occurrence: meta[1])
+        site_to_be_update = all_site_id_in_meta_data - site_id_new_list
+        book_meta = self.find_book_meta(book_details, isbn_key, site_to_be_update)
+        book_meta_hash = {}
+        book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
+        self.updated_book_meta(book_details, site_to_be_update, book_meta_hash)
+        meta = self.calculate_rating_avg(book_meta_data.merge!(book_meta_hash))
+        book_details.update_attributes(average_rating: meta[0], occurrence: site_id_new_list.count)
       else
         self.find_book_with_isbn(isbn_key).first.destroy
         destroy_books_index = destroy_books_index + 1
@@ -184,6 +203,18 @@ class BookDetail < ActiveRecord::Base
     puts "#{destroy_books_index}...books deleted"
     puts "#{create_book_metas_index}...book meta created"
     puts "#{update_book_metas_index}...book data updated"
+  end
+
+  def self.updated_book_meta(book_details, site_id, book_meta)
+    site_id.each do |id|
+      if book_meta.key?(id)
+        meta = book_meta[id]
+        book_meta_to_update = book_details.book_metas.site_id(id).first
+        book_meta_to_update.update_attributes(rating_count: meta[:rating_count], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
+      else
+        book_details.book_metas.site_id(id).first.destroy
+      end
+    end
   end
 
   def self.filter_books!(books_details, unique_books_details)

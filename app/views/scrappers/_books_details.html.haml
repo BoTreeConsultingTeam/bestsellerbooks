@@ -14,19 +14,24 @@
                     %img{:alt => "", :src => "#{book_data[:images]}", style: "height: 140px;"}
                   %p
                     %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
-                      -if book_data[:title].length < 50
-                        = label_tag book_data[:title], nil, class: 'bold', style: "font-size: 16px" 
+                      -if book_data[:title].length < 43
+                        = label_tag book_data[:title], nil, class: 'bold book_title'
                       - else
-                        = label_tag "#{book_data[:title][1..52]}...", nil, class: 'bold', style: "font-size: 16px" 
+                        = label_tag "#{book_data[:title][0..43]}...", nil, class: 'bold book_title'
                   %p.book_author
                     %strong By:
-                    = book_data[:author].presence || ''
+                    -if book_data[:author].nil?
+                      - "-"
+                    -else
+                      - if book_data[:author].length > 27
+                        = "#{book_data[:author][0..27]}..."
+                      - else
+                        = book_data[:author]
                   %p
                     - min_price = BookDetail.book_price(book_data).first
-                    %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank"}
-                      %strong
-                        %a{title: "Buy from #{min_price.site[:name]}"}
-                          = "Best Buy ₹ #{min_price[:price]}"
+                    %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank", title: "buy @#{min_price.site[:name]}"}
+                      = "Best Buy ₹ #{min_price[:price]}"
+                      = hidden_field_tag "min_price_site_name", min_price.site[:name]
     - else
       %p
         %p
