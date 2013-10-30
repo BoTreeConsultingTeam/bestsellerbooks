@@ -60,6 +60,6 @@ module Bestsellerbooks
     config.assets.version = '1.0'
 
     # https://devcenter.heroku.com/articles/getting-started-with-rails3#setting-up-the-asset-pipeline
-    config.assets.initialize_on_precompile
+    config.assets.initialize_on_precompile = false
   end
 end
