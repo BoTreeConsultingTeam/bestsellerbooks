@@ -58,7 +58,7 @@
 							.new_separate_star_rating{id: "new_star_#{index}"}
 							- index = index + 1
 					%td
-						= price[:delivery_days]
+						= price[:delivery_days].presence || '2-4'
 					%td
 						%a{href: "#{price[:book_detail_url] }",target: "_blank"}
 							%i.icon-shopping-cart
