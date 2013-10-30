@@ -58,5 +58,8 @@ module Bestsellerbooks
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # https://devcenter.heroku.com/articles/getting-started-with-rails3#setting-up-the-asset-pipeline
+    config.assets.initialize_on_precompile
   end
 end
