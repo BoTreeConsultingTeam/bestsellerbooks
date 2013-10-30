@@ -8,30 +8,27 @@
         .row-fluid
           %ul.thumbnails
             -row.each do |book_data|
-              %li.span3.text-center
+              %li.span3
                 .thumbnail
-                  %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
-                    %img{:alt => "", :src => "#{book_data[:images]}", style: "height: 140px;"}
-                  %p
+                  %p.text-center
                     %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
-                      -if book_data[:title].length < 43
-                        = label_tag book_data[:title], nil, class: 'bold book_title'
+                      %img{:alt => "", :src => "#{book_data[:images]}", style: "height: 140px;"}
+                  %h3
+                    %a{:href => "#{price_details_path(book_data[:id])}", "data-remote" => true}
+                      -if book_data[:title].length < 50
+                        = book_data[:title]
                       - else
-                        = label_tag "#{book_data[:title][0..43]}...", nil, class: 'bold book_title'
-                  %p.book_author
-                    %strong By:
-                    -if book_data[:author].nil?
-                      - "-"
-                    -else
-                      - if book_data[:author].length > 27
-                        = "#{book_data[:author][0..27]}..."
-                      - else
-                        = book_data[:author]
-                  %p
-                    - min_price = BookDetail.book_price(book_data).first
-                    %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank", title: "buy @#{min_price.site[:name]}"}
-                      = "Best Buy ₹ #{min_price[:price]}"
-                      = hidden_field_tag "min_price_site_name", min_price.site[:name]
+                        = "#{book_data[:title][1..52]}..."
+                  .bookInfo
+                    %p.book_author
+                      %strong By:
+                      = book_data[:author].presence || ''
+                    %p
+                      - min_price = BookDetail.book_price(book_data).first
+                      %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank"}
+                        %strong
+                          %a{title: "Buy from #{min_price.site[:name]}"}
+                            = "Best Buy ₹ #{min_price[:price]}"
     - else
       %p
         %p

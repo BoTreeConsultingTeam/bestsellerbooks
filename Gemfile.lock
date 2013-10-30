@@ -104,6 +104,8 @@ GEM
       railties (= 3.2.14)
     rails3-jquery-autocomplete (1.0.11)
       rails (~> 3.0)
+    rails_config (0.3.3)
+      activesupport (>= 3.0)
     railties (3.2.14)
       actionpack (= 3.2.14)
       activesupport (= 3.2.14)
@@ -163,6 +165,7 @@ DEPENDENCIES
   pg
   rails (= 3.2.14)
   rails3-jquery-autocomplete
+  rails_config
   sass-rails
   therubyracer
   twitter-bootstrap-rails (= 2.2.7)

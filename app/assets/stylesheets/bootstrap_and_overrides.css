@@ -7,10 +7,13 @@
   */
 
 .thumbnail {
-    height: 255px; padding-top: 7px;
+    height: 255px; padding: 10px; position: relative;
 }
-.thumbnail p {text-align: left}
+.thumbnail p { margin: 0; padding: 0 0 10px 0; }
+.thumbnail h3 { margin: 0; padding: 0 0 10px 0; font-size: 13px; font-weight: bold; line-height: 20px;}
 .thumbnails p {font-size: 12px}
+.bookInfo { font-size: 12px; line-height: 20px; max-width: 235px; position: absolute; bottom: 10px; left: 10px; }
+.bookInfo p { margin: 0; padding: 0 0 5px 0; }
 .table {
     margin-bottom: 0;
 }

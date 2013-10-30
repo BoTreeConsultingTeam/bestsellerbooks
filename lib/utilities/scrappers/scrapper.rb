@@ -9,6 +9,8 @@ module Utilities
       
       attr_accessor :page, :book_details, :isbn, :url, :book_search, :sub_page
 
+       SITE_LIST = [:amazon, :flipkart, :landmark, :crossword, :uread, :homeshop18, :indiatimes]
+
       def initialize(url)
         begin
           @page = Mechanize.new.get(url)
@@ -79,26 +81,17 @@ module Utilities
       def self.collect
         unique_books_details = {}
 
-        amazon = get_main_page_scrapper(:amazon)
-        unique_books_details = amazon.crawl(unique_books_details)
+        SITE_LIST.each do |site|
+          scrapper = get_main_page_scrapper(site)
+          begin
+            unique_books_details = scrapper.crawl(unique_books_details)
+          rescue StandardError => e
+            puts "[ERROR] Something went wrong while crawling #{site.to_s}. Scrapper would not collect books from this site"
+            puts "[ERROR] #{e.message}"
+          end
+        end
 
-        flipkart = get_main_page_scrapper(:flipkart)
-        unique_books_details = flipkart.crawl(unique_books_details)
-
-        landmark = get_main_page_scrapper(:landmark)
-        unique_books_details = landmark.crawl(unique_books_details)
-
-        crossword = get_main_page_scrapper(:crossword)
-        unique_books_details = crossword.crawl(unique_books_details)
-
-        uread = get_main_page_scrapper(:uread)
-        unique_books_details = uread.crawl(unique_books_details)
-
-        homeshop18 = get_main_page_scrapper(:homeshop18)
-        unique_books_details = homeshop18.crawl(unique_books_details)
-
-        indiatimes = get_main_page_scrapper(:indiatimes)
-        unique_books_details = indiatimes.crawl(unique_books_details)
+        unique_books_details
       end
       
     end

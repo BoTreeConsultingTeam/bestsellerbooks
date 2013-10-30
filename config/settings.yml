@@ -1,0 +1,17 @@
+websites:
+  list:
+    amazon: 'http://www.amazon.in/gp/bestsellers/books/ref=sa_menu_books_bestsellers.html'
+    flipkart: 'http://www.flipkart.com/view-books/l121/bestseller-literature-fiction'
+    landmark: 'http://www.landmarkonthenet.com/page/bestselling-books'
+    crossword: 'http://www.crossword.in/see_more_pages/books-best-sellers-seemore-data'
+    uread: 'http://www.uread.com/view-books/10/uread-top'
+    homeshop18: 'http://www.homeshop18.com/shop/bestseller/categoryid:10000'
+    indiatimes: 'http://shopping.indiatimes.com/books/books-best-sellers-in-books'
+  search:
+    amazon: 'http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=#{isbn}&rh=n%3A976389031%2Ck%3A#{isbn}'
+    flipkart: 'http://www.flipkart.com/search?q='
+    landmark: 'http://www.landmarkonthenet.com/search/?q='
+    crossword: 'http://www.crossword.in/books/search?q='
+    uread: 'http://www.uread.com/search-books/'
+    homeshop18: 'http://www.homeshop18.com/search:'
+    indiatimes: 'http://shopping.indiatimes.com/mtkeywordsearch?SEARCH_STRING#{isbn}&catalog=10011'
