@@ -16,4 +16,5 @@
 //= require autocomplete-rails
 //= require jquery.blockUI
 //= require jquery.ui.all
+//= require jquery.raty.min
 //= require_tree .
