@@ -88,6 +88,7 @@ module Utilities
           rescue StandardError => e
             puts "[ERROR] Something went wrong while crawling #{site.to_s}. Scrapper would not collect books from this site"
             puts "[ERROR] #{e.message}"
+            raise e
           end
         end
 
