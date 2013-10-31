@@ -1,8 +1,6 @@
 .container-fluid
   = render partial: 'hero'
-  .row-fluid
-    .span10
-      = render :partial => 'search'	
+  = hidden_field_tag "search_data", @search_data
   .row-fluid
     .span2
       = render :partial => 'category'
