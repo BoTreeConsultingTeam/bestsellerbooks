@@ -15,3 +15,13 @@ websites:
     uread: 'http://www.uread.com/search-books/'
     homeshop18: 'http://www.homeshop18.com/search:'
     indiatimes: 'http://shopping.indiatimes.com/mtkeywordsearch?SEARCH_STRING#{isbn}&catalog=10011'
+security:
+  recaptcha:
+    public_key: <%= ENV['RECAPTCHA_PUBLIC_KEY'] %>
+    private_key: <%= ENV['RECAPTCHA_PRIVATE_KEY'] %>
+marketing:
+  hero_text: We collect bestseller books and compare prices from amazon.in, flipkart.com, landmarkonthenet.com, crossword.in, uread.com, homeshop18.com and indiatimes.com
+analytics:
+  google:
+    tracker_code: <%= ENV['GOOGLE_ANALYTICS_TRACKER_CODE'] %>
+    tracking_site: <%= ENV['GOOGLE_ANALYTICS_TRACKING_SITE'] %>

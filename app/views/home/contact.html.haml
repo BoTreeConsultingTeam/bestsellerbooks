@@ -1,0 +1,30 @@
+.container
+  .row
+    .span4
+      %h2 Address
+      %address
+        %strong BeverLogic
+        %br/
+        FF-7, JBR Arcade,
+        %br/
+        Science City Road,
+        %br/
+        Sola, Ahmedabad
+        %br/
+        India - 380060
+    .span8
+      %h2 Send Us A Message
+      = form_for @guest_post, url: guest_book_path do |f|
+        = render 'layouts/errors', object: @guest_post
+        = f.label :name
+        = f.text_field :name, class: 'span3', placeholder: 'Your Name'
+        = f.label :email
+        = f.text_field :email, class: 'span3', placeholder: 'Your email address'
+        = f.label :subject
+        = f.select :subject, options_for_select([['Please select...', ''], ['Suggestions', 'suggestions'], ['Customer Service', 'service'], ['Business Inquiry', 'business']])
+        = f.label :message
+        = f.text_area :message, class: 'input-xlarge span5', rows: 3
+        = f.label 'Word verification'
+        = recaptcha_tags
+        %br
+        = f.submit 'Send', class: 'btn btn-primary pull-left'

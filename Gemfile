@@ -28,3 +28,6 @@ gem 'rails3-jquery-autocomplete'
 
 #Configuration
 gem "rails_config"
+
+#Security
+gem "recaptcha", :require => "recaptcha/rails"

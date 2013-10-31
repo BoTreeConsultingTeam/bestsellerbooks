@@ -1,0 +1,13 @@
+-# https://coderwall.com/p/zmgs-g
+- if object.errors.any?
+  .alert.alert-error
+    %a.close{"data-dismiss" => "alert"} ×
+    %ul
+      - object.errors.full_messages.each do |msg|
+        = content_tag :li, msg, :id => "error_#{msg}" if msg.is_a?(String)
+
+- flash.each do |name, msg|
+  - if msg.is_a?(String) && name == :notice
+    %div{class: "alert alert-success" }
+      %a.close{"data-dismiss" => "alert"} ×
+      = content_tag :div, msg, :id => "flash_#{name}"

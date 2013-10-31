@@ -1,5 +1,8 @@
 Bestsellerbooks::Application.routes.draw do
   
+  get 'contact' => 'home#contact'
+  post 'guest_book' => 'home#guest_book'
+
   root :to => 'scrappers#show_latest_books'
   get "books/show_latest_books"
   get 'books/price_details', to: "scrappers#price_details", as: 'price_details'

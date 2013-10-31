@@ -116,6 +116,7 @@ GEM
     rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    recaptcha (0.3.5)
     ref (1.0.5)
     sass (3.2.12)
     sass-rails (3.2.6)
@@ -166,6 +167,7 @@ DEPENDENCIES
   rails (= 3.2.14)
   rails3-jquery-autocomplete
   rails_config
+  recaptcha
   sass-rails
   therubyracer
   twitter-bootstrap-rails (= 2.2.7)

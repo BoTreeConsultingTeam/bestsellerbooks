@@ -1,0 +1,22 @@
+!!!
+%html
+  %head
+    %title Best Seller Books - Buy Bestseller Books Online at Best Prices in India
+    %meta{content: "buy books online, shop books online, online shopping for books, book comparision, price comparision, books store online, bestseller books, bestselling books, best, deal, online, reviews, low, price, flipkart, amazon india, crossword, landmar, bookadda", name: "keywords"}/
+    = stylesheet_link_tag    "application", media: "all"
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+  %body
+    #main_div
+      = render partial: "layouts/navigation"
+      = yield
+      #dialog{title: "Book Details"}
+  .ajax-progress
+  - if Rails.env.production?
+    :javascript
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', "#{Settings.analytics.google.tracker_code}", "#{Settings.analytics.google.tracking_site}");
+      ga('send', 'pageview');

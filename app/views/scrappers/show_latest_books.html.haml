@@ -1,8 +1,9 @@
 .container-fluid
-  .row
+  = render partial: 'hero'
+  .row-fluid
     .span10
       = render :partial => 'search'	
-  .row
+  .row-fluid
     .span2
       = render :partial => 'category'
     .span10

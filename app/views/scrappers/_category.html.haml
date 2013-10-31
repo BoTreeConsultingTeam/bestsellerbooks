@@ -1,4 +1,5 @@
 %ul.nav.nav-list
+  %li.nav-header Categories
   - @book_category.each do |category|
     %li
       = link_to category[:category_name], show_books_by_category_path(category[:id]),method: :get,remote: true,class: "category_link link_#{category[:id]}"
