@@ -92,7 +92,7 @@ module Utilities
           details.merge!("rating_count".to_sym => rating_count)
           price = sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,'')
           if price.nil?
-            price = sub_page.search('#pricing_summary .list_price ').text().gsub(/\D/,'')
+            price = sub_page.search('#pricing_summary .list_price label').text().gsub(/\D/,'')
           end
           details.merge!("price".to_sym => sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,''))
         end

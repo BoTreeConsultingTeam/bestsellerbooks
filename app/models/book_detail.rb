@@ -26,14 +26,34 @@ class BookDetail < ActiveRecord::Base
             site_id << site_key.to_i
             book_detail_value.merge!(site_id: site_key)
             book_meta_data << book_detail_value
-            create_category_details(value[:category], book_details) if !value[:category].nil?
+            self.create_category_details(value[:category], book_details) unless value[:category].nil?
           end
           isbn = book_details[:isbn]
-          create_book_meta(book_details, book_meta_data)
+          self.create_book_meta(book_details, book_meta_data)
         end
       rescue Exception => e
         logger.debug "In...#{key}...book isbn...error occured"
         logger.debug "Book data of...#{key}...#{value}"
+      end
+    end
+    self.manually_add_book
+  end
+
+  def self.manually_add_book
+    book_isbn = BestsellerIsbn.pluck(:isbn)
+    book_isbn.map do |isbn|
+      url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
+      amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
+      amazon.process_page
+      book_data = amazon.book_details
+      data = book_data[0]
+      book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating])
+      if book_details.persisted?
+        book_details.book_metas.update_attributes(rating_count: data[:rating_count], delivery_days: data[:delivery_days], book_detail_url: data[:book_detail_url], price: data[:price], discount: data[:discount], rating: data[:rating])
+      else
+        book_details.save
+        self.create_category_details(data[:category], book_details) unless data[:category].nil?
+        book_details.book_metas.create!(rating_count: data[:rating_count], delivery_days: data[:delivery_days], site_id: data[:site_id], book_detail_url: data[:book_detail_url], price: data[:price], discount: data[:discount], rating: data[:rating])
       end
     end
   end
@@ -136,8 +156,8 @@ class BookDetail < ActiveRecord::Base
         end
         if !book_detail.empty? && !book_detail[:price].nil? && book_detail[:isbn] == isbn
           book_detail.merge!("site_id".to_sym => site_ids)
-          category = book_detail[:category]
-          create_category_details(category, book) unless category.nil?
+          categories = book_detail[:category]
+          create_category_details(categories, book) unless categories.nil?
           all_book_data << book_detail
         end
       end
@@ -145,13 +165,15 @@ class BookDetail < ActiveRecord::Base
     all_book_data
   end
 
-  def self.create_category_details(category_from_site, book_details)
-    category_from_site.each do |categorys|
-      sub_category = categorys.gsub(/\&/,"").split
-      sub_category.each do |category|
-        if category.length > 3
-          category = BookCategory.where("category_name ilike '%#{category.gsub(/'s/,'')}%'")
-          book_details.book_categories << category unless category.nil?
+  def self.create_category_details(categories_from_site, book_details)
+    categories_from_site.each do |categories|
+      sub_categories = categories.gsub(/\&/,"").split
+      sub_categories.each do |sub_category|
+        if sub_category.length > 3
+          book_categories = BookCategory.where("category_name ilike '%#{sub_category.gsub(/'s/,'')}%'")
+          book_categories.map do |book_category|
+            book_details.book_categories << c unless book_details.book_categories.include?(book_category)
+          end
         end
       end
     end

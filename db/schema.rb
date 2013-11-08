@@ -11,7 +11,13 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131025111939) do
+ActiveRecord::Schema.define(:version => 20131108063710) do
+
+  create_table "bestseller_isbns", :force => true do |t|
+    t.string   "isbn"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "book_categories", :force => true do |t|
     t.text     "category_name"
@@ -54,6 +60,10 @@ ActiveRecord::Schema.define(:version => 20131025111939) do
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
   end
+
+  add_index "category_details", ["book_category_id", "book_detail_id"], :name => "index_category_details_on_book_category_id_and_book_detail_id", :unique => true
+  add_index "category_details", ["book_category_id"], :name => "index_category_details_on_book_category_id"
+  add_index "category_details", ["book_detail_id"], :name => "index_category_details_on_book_detail_id"
 
   create_table "sites", :force => true do |t|
     t.string   "name"

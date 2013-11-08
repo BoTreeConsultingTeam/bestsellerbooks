@@ -35,6 +35,18 @@ end
 	category_name = BookCategory.where(category).first_or_initialize
 	unless category_name.persisted?
 		category_name.save
-		puts "#{category_name.name}...is created"
+		puts "#{category_name.category_name}...is created"
+	end
+end
+
+[{isbn: "9781451696196"},
+	{isbn: "9781907411151"},
+	{isbn: "9780007489978"},
+	{isbn: "9780007489978"},
+	{isbn: "9780007488513"}].map do |book_isbn|
+	book = BestsellerIsbn.where(book_isbn).first_or_initialize
+	unless book.persisted?
+		book.save
+		puts "#{book.isbn}...is created"
 	end
 end
