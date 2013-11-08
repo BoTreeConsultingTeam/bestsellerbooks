@@ -49,7 +49,12 @@ class BookDetail < ActiveRecord::Base
       data = book_data[0]
       book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating])
       if book_details.persisted?
-        book_details.book_metas.update_attributes(rating_count: data[:rating_count], delivery_days: data[:delivery_days], book_detail_url: data[:book_detail_url], price: data[:price], discount: data[:discount], rating: data[:rating])
+        book = self.find_book_with_isbn(data[:isbn]).first
+        sites_id = book.book_metas.pluck(:site_id)
+        book_meta = self.find_book_meta(book, data[:isbn], sites_id)
+        book_meta_hash = {}
+        book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
+        # self.updated_book_meta(book, sites_id, book_meta_hash)
       else
         book_details.save
         self.create_category_details(data[:category], book_details) unless data[:category].nil?
@@ -172,7 +177,7 @@ class BookDetail < ActiveRecord::Base
         if sub_category.length > 3
           book_categories = BookCategory.where("category_name ilike '%#{sub_category.gsub(/'s/,'')}%'")
           book_categories.map do |book_category|
-            book_details.book_categories << c unless book_details.book_categories.include?(book_category)
+            book_details.book_categories << book_category unless book_details.book_categories.include?(book_category)
           end
         end
       end
@@ -186,6 +191,8 @@ class BookDetail < ActiveRecord::Base
   def self.refresh_books_detail!(fresh_list_of_books_details)
     existing_books  = {}
     database_books_details_isbn = self.pluck(:isbn)
+    bestseller_isbn = BestsellerIsbn.pluck(:isbn)
+    database_books_details_isbn = database_books_details_isbn - bestseller_isbn
     database_books_details_isbn.each { |isbn|
       existing_books.merge!(isbn => isbn)
     }
