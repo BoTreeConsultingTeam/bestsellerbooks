@@ -26,8 +26,8 @@ module Utilities
             rescue Exception => e
               publisher = nil
             end
-            img_url = li_item.search('.cover a img').attr('src').text()
-            href_url = li_item.search('.cover a').attr('href').text()
+            img_url = li_item.search('.cover a img').attr('src').text().squish
+            href_url = li_item.search('.cover a').attr('href').text().squish
             tr = li_item.search('.price-attrib .attributes table tr')
             tr.each do |tr_item|
               if tr_item.search('td')[0].text() == "Language:"

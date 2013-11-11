@@ -9,8 +9,8 @@ module Utilities
       def process_page
         unless page.nil?
           begin
-            href_url = page.search('#atfResults a').attr('href').text()
-            img_url = page.search('#atfResults a img').attr('src').text()
+            href_url = page.search('#atfResults a').attr('href').text().squish
+            img_url = page.search('#atfResults a img').attr('src').text().squish
           rescue Exception => e
             href_url = nil
             img_url = nil

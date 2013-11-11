@@ -9,7 +9,7 @@ module Utilities
       def process_page
         unless page.nil?
           begin
-            href_url = 'http://shopping.indiatimes.com' + page.search('.productlisting .productcoloumn .productdetail a').attr('href').text()
+            href_url = 'http://shopping.indiatimes.com' + page.search('.productlisting .productcoloumn .productdetail a').attr('href').text().squish
           rescue Exception => e
             href_url = nil
           end

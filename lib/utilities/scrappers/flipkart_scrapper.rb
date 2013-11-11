@@ -17,8 +17,8 @@ module Utilities
           li.each_with_index do |li_item, index|
             title = li_item.search('.fk-sitem-image-section a img').attr('title').text().squish.strip
             discount =  li_item.search('.fk-sitem-info-section .fk-font-small').text().gsub(/\D/,'')
-            img_url = li_item.search('.fk-sitem-image-section .rposition a img').attr('data-src').text()
-            href_url = 'http://www.flipkart.com' + li_item.search('.fk-sitem-image-section a').attr('href').text()
+            img_url = li_item.search('.fk-sitem-image-section .rposition a img').attr('data-src').text().squish
+            href_url = 'http://www.flipkart.com' + li_item.search('.fk-sitem-image-section a').attr('href').text().squish
             meta = process_sub_page(href_url)
             unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {

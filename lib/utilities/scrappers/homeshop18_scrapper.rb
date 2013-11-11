@@ -16,8 +16,8 @@ module Utilities
           li = page.search('#bestSellerResultsDiv .books-list-item')
           li.each_with_index do |li_item, index|
             title = li_item.search('.listView_details .listView_title a').attr('title').text().squish.strip
-            img_url = li_item.search('.listView_image a img').attr('data-original').text()
-            href_url = 'http://www.homeshop18.com' + li_item.search('.listView_image a').attr('href').text().squish.strip
+            img_url = li_item.search('.listView_image a img').attr('data-original').text().squish
+            href_url = 'http://www.homeshop18.com' + li_item.search('.listView_image a').attr('href').text().squish
             meta = process_sub_page(href_url)
             unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {

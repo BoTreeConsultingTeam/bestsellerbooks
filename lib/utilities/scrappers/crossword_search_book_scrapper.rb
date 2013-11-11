@@ -12,7 +12,7 @@ module Utilities
           li.each_with_index do |li_item, index|
             price = li_item.search('.variant-desc .price .variant-final-price').text().gsub(/\D/,'').strip
             begin
-              href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text()
+              href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text().squish
             rescue Exception => e
               href_url = nil
             end

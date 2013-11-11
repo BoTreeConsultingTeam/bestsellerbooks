@@ -17,8 +17,8 @@ module Utilities
           li.each_with_index do |li_item, index|
             title = li_item.search('.info h1 a').attr('title').text().squish.strip
             author = li_item.search('.info h2 a').text().squish.strip
-            img_url = li_item.search('.image a img').attr('src').text()
-            href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text()
+            img_url = li_item.search('.image a img').attr('src').text().squish
+            href_url =  'http://www.landmarkonthenet.com' + li_item.search('.image a').attr('href').text().squish
             meta = process_sub_page(href_url)
             unless meta.nil? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {

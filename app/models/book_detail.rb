@@ -34,33 +34,38 @@ class BookDetail < ActiveRecord::Base
       rescue Exception => e
         logger.debug "In...#{key}...book isbn...error occured"
         logger.debug "Book data of...#{key}...#{value}"
+        logger.debug "error message...#{e.message}"
       end
     end
     self.manually_add_book
   end
 
   def self.manually_add_book
+    logger.debug "manually add books start"
     book_isbn = BestsellerIsbn.pluck(:isbn)
     book_isbn.map do |isbn|
       url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
       amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
       amazon.process_page
       book_data = amazon.book_details
-      data = book_data[0]
-      book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating])
-      if book_details.persisted?
-        book = self.find_book_with_isbn(data[:isbn]).first
-        sites_id = book.book_metas.pluck(:site_id)
-        book_meta = self.find_book_meta(book, data[:isbn], sites_id)
-        book_meta_hash = {}
-        book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
-        # self.updated_book_meta(book, sites_id, book_meta_hash)
-      else
-        book_details.save
-        self.create_category_details(data[:category], book_details) unless data[:category].nil?
-        book_details.book_metas.create!(rating_count: data[:rating_count], delivery_days: data[:delivery_days], site_id: data[:site_id], book_detail_url: data[:book_detail_url], price: data[:price], discount: data[:discount], rating: data[:rating])
+      unless book_data.nil?
+        data = book_data[0]
+        book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating], occurrence: 0)
+        if book_details.persisted?
+          book = self.find_book_with_isbn(data[:isbn]).first
+          sites_id = book.book_metas.pluck(:site_id)
+          book_meta = self.find_book_meta(book, data[:isbn], sites_id)
+          book_meta_hash = {}
+          book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
+          self.updated_book_meta(book, sites_id, book_meta_hash)
+        else
+          book_details.save
+          self.create_category_details(data[:category], book_details) unless data[:category].nil?
+          book_details.book_metas.create!(rating_count: data[:rating_count], delivery_days: data[:delivery_days], site_id: data[:site_id], book_detail_url: data[:book_detail_url], price: data[:price], discount: data[:discount], rating: data[:rating])
+        end
       end
     end
+    logger.debug "manually add books completed"
   end
 
   def self.update_average_rating(book_data, book_details)
@@ -108,6 +113,7 @@ class BookDetail < ActiveRecord::Base
       rescue Exception => e
         logger.debug "book id...#{book_details.id}...isbn...#{book_details.isbn}"
         logger.debug "Error occured while creating book meta of ...#{meta}"
+        logger.debug "error message...#{e.message}"
       end
     end
   end
@@ -156,9 +162,7 @@ class BookDetail < ActiveRecord::Base
       site_data.process_page
       book_data = site_data.book_details
       book_data.each do |book_detail|
-        if book_detail[:book_detail_url].nil?
-          book_detail[:book_detail_url] = url
-        end
+        book_detail[:book_detail_url] = url if book_detail[:book_detail_url].nil?
         if !book_detail.empty? && !book_detail[:price].nil? && book_detail[:isbn] == isbn
           book_detail.merge!("site_id".to_sym => site_ids)
           categories = book_detail[:category]
@@ -172,13 +176,11 @@ class BookDetail < ActiveRecord::Base
 
   def self.create_category_details(categories_from_site, book_details)
     categories_from_site.each do |categories|
-      sub_categories = categories.gsub(/\&/,"").split
+      sub_categories = categories.split
       sub_categories.each do |sub_category|
         if sub_category.length > 3
           book_categories = BookCategory.where("category_name ilike '%#{sub_category.gsub(/'s/,'')}%'")
-          book_categories.map do |book_category|
-            book_details.book_categories << book_category unless book_details.book_categories.include?(book_category)
-          end
+          book_categories.map { |book_category| book_details.book_categories << book_category unless book_details.book_categories.include?(book_category) }
         end
       end
     end
@@ -193,9 +195,7 @@ class BookDetail < ActiveRecord::Base
     database_books_details_isbn = self.pluck(:isbn)
     bestseller_isbn = BestsellerIsbn.pluck(:isbn)
     database_books_details_isbn = database_books_details_isbn - bestseller_isbn
-    database_books_details_isbn.each { |isbn|
-      existing_books.merge!(isbn => isbn)
-    }
+    database_books_details_isbn.each { |isbn| existing_books.merge!(isbn => isbn) }
     destroy_books_index = 0
     create_book_metas_index = 0
     update_book_metas_index = 0
@@ -236,8 +236,8 @@ class BookDetail < ActiveRecord::Base
 
   def self.updated_book_meta(book_details, site_id, book_meta)
     site_id.each do |id|
-      if book_meta.key?(id)
-        meta = book_meta[id]
+      if book_meta.key?("#{id}")
+        meta = book_meta["#{id}"]
         book_meta_to_update = book_details.book_metas.site_id(id).first
         book_meta_to_update.update_attributes(rating_count: meta[:rating_count], price: meta[:price], discount: meta[:discount], rating: meta[:rating])
       else

@@ -39,14 +39,17 @@ end
 	end
 end
 
-[{isbn: "9781451696196"},
-	{isbn: "9781907411151"},
-	{isbn: "9780007489978"},
-	{isbn: "9780007489978"},
-	{isbn: "9780007488513"}].map do |book_isbn|
-	book = BestsellerIsbn.where(book_isbn).first_or_initialize
-	unless book.persisted?
-		book.save
-		puts "#{book.isbn}...is created"
-	end
-end
+puts 'Saving book ISBN...'
+ existing_isbn = BestsellerIsbn.pluck(:isbn)
+ manually_add_isbn = ["9781451696196", "9781907411151", "9780007489978"]
+ manually_add_isbn.each do |isbn|
+     bestseller_isbn = BestsellerIsbn.where(isbn: isbn).first_or_initialize
+     unless bestseller_isbn.persisted?
+       bestseller_isbn.save
+       puts "#{isbn}...is created"
+     end
+  end
+  existing_isbn = existing_isbn - manually_add_isbn
+  BestsellerIsbn.where(isbn: existing_isbn).destroy_all
+  puts "#{existing_isbn}....isbn's deleted"
+puts 'Book ISBN saved...'

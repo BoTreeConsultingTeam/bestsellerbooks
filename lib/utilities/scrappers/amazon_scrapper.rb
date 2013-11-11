@@ -16,8 +16,8 @@ module Utilities
           site_id = Site.find_by_name("amazon")
           li.each_with_index do |li_item, index|
             author = li_item.search('.zg_itemWrapper .zg_byline').text().gsub(/by/,'').squish.strip
-            img_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a img').attr('src').text()
-            href_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a').attr('href').text()
+            img_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a img').attr('src').text().squish
+            href_url = li_item.search('.zg_itemWrapper .zg_image .zg_itemImageImmersion a').attr('href').text().squish
             sub_page = page_instance(href_url)
             meta = AmazonScrapper.process_sub_page(sub_page)
             unless meta.empty? || meta[:isbn].nil?

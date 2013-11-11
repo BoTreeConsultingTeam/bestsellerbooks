@@ -17,9 +17,9 @@ module Utilities
           li.each_with_index do |li_item, index|
             title = li_item.search('.productdetail a').text().squish.strip
             author = li_item.search('.productdetail h3').text().squish.strip
-            img_url = li_item.search('.productthumb a.listproductthumb img').attr('data-original').text()
+            img_url = li_item.search('.productthumb a.listproductthumb img').attr('data-original').text().squish
             img_url = "http:" + img_url if img_url.match('http'||'https').nil?
-            href_url = 'http://shopping.indiatimes.com' + li_item.search('.productthumb a.listproductthumb').attr('href').text()
+            href_url = 'http://shopping.indiatimes.com' + li_item.search('.productthumb a.listproductthumb').attr('href').text().squish
             meta = process_sub_page(href_url)
             unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {

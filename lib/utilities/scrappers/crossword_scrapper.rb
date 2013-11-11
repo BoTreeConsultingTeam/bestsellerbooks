@@ -16,9 +16,9 @@ module Utilities
           site_id = Site.find_by_name("crossword")
           li.each_with_index do |li_item, index|
             author = li_item.search('.contributors .ctbr-name a').text().squish.strip
-            img_url = li_item.search('.variant-image a img').attr('src').text()
+            img_url = li_item.search('.variant-image a img').attr('src').text().squish
             title = li_item.search('.variant-image a img').attr('title').text()
-            href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text()
+            href_url = 'http://www.crossword.in' + li_item.search('.variant-image a').attr('href').text().squish
             meta = process_sub_page(href_url)
             unless meta.empty? || meta[:isbn].nil?
               li_map = { "#{meta[:isbn]}" => {
@@ -87,14 +87,15 @@ module Utilities
           end
           delivery_days =  sub_page.search('#in_stock .ships-in b').text().gsub(/\ days/,'').squish
           details.merge!("delivery_days".to_sym => delivery_days)
-          details.merge!("discount".to_sym => sub_page.search('#pricing_summary .discount_gola').text().gsub(/\D/,''))
+          pricing_summary = sub_page.search('#pricing_summary')
+          details.merge!("discount".to_sym => pricing_summary.search('.discount_gola').text().gsub(/\D/,''))
           details.merge!("rating".to_sym => rating)
           details.merge!("rating_count".to_sym => rating_count)
-          price = sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,'')
-          if price.nil?
-            price = sub_page.search('#pricing_summary .list_price label').text().gsub(/\D/,'')
+          price = pricing_summary.search('.our_price span').text().gsub(/\D/,'')
+          if price.empty?
+            price = pricing_summary.search('.list_price span').text().gsub(/\D/,'')
           end
-          details.merge!("price".to_sym => sub_page.search('#pricing_summary .our_price span').text().gsub(/\D/,''))
+          details.merge!("price".to_sym => price)
         end
         details
       end

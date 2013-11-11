@@ -20,13 +20,12 @@
                         = label_tag "#{book_data[:title][0..43]}...", nil, class: 'bold book_title'
                   %p.book_author
                     %strong By:
-                    -if book_data[:author].nil?
-                      - "-"
-                    -else
-                      - if book_data[:author].length > 27
-                        = "#{book_data[:author][0..27]}..."
-                      - else
-                        = book_data[:author]
+                    - if !book_data[:author].nil? && book_data[:author].length > 27
+                      = "#{book_data[:author][0..27]}..."
+                    - elsif !book_data[:author].nil? && book_data[:author].length < 27
+                      = book_data[:author]
+                    - else
+                      = "-"
                   %p
                     - min_price = BookDetail.book_price(book_data).first
                     %a.min_price{:href => "#{min_price[:book_detail_url]}", target: "_blank", title: "buy @#{min_price.site[:name]}"}
