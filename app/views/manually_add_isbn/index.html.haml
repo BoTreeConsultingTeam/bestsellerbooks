@@ -1,0 +1,9 @@
+.row
+	.span6.offset2
+		= render :partial => 'create_book_isbn'
+.row
+	.span6.offset2
+		= form_tag manually_add_isbn_search_path, method: :get, remote: true do
+			= text_field_tag :search, nil
+			= submit_tag "search Book", class: "btn btn-primary create_book"
+		#display_book_isbn= render :partial => 'book_isbn', :locals => { paginate_action: "show" }

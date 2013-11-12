@@ -24,3 +24,21 @@ abbr[title], abbr[data-original-title] {
 	font-size: 16px;
 	height: 41px;
 }
+.isbn {
+  width: 30%;
+}
+.destroy {
+  width: 20%;
+}
+.title {
+  width: 50%;
+}
+.create_book {
+  margin-bottom: 8px;
+}
+.isbn_table {
+  margin-bottom: 20px;
+}
+.pagination {
+  margin-top: 0px;
+}

@@ -1,0 +1,10 @@
+= form_tag manually_add_isbn_create_path, method: :get, remote: true do
+  %dt Book ISBN:
+  %dd
+    = text_field_tag :isbn
+  %dt Book Title:
+  %dd
+    = text_field_tag :book_title
+  %dt
+  %dd
+    = button_tag 'Submit', class: "btn btn-primary"

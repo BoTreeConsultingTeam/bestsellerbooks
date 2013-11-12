@@ -1,0 +1,4 @@
+$('#display_book_isbn').html('<%= escape_javascript(render :partial => 'book_isbn',
+ :locals => { paginate_action: "search" }) %>')
+$('.alert.alert-error').alert('close')
+$('.alert.alert-notice').alert('close')

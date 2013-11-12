@@ -1,0 +1,3 @@
+$('#display_book_isbn').html('<%= escape_javascript(render :partial => 'book_isbn',
+ :locals => { books_isbn: @books_isbn, paginate_action: "create" }) %>');
+$('#flash_div').html('<%= escape_javascript(render :partial => 'layouts/flash') %>');

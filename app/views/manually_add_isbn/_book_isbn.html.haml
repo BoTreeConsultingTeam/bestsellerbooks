@@ -1,0 +1,18 @@
+%table.table.table-striped.isbn_table
+	%tr
+		%th.isbn
+			= "ISBN"
+		%th.title
+			= "Title"
+		%th.destroy
+	- @books_isbn.each do |book_isbn|
+		%tr
+			%td.isbn
+				= book_isbn.isbn
+			%td.title
+				= book_isbn.title
+			%td.destroy
+				- @search.presence || @search = "0"
+				= link_to "destroy", manually_add_isbn_destroy_path(book_isbn.id, @search), remote: true
+- unless @books_isbn.nil?
+	= paginate @books_isbn, :params => {:action => paginate_action}, remote: true
