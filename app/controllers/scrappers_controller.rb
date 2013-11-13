@@ -1,6 +1,14 @@
 # require 'csv'
 
 class ScrappersController < ApplicationController
+
+  before_filter :authenticate_user!, :check_if_admin, :only => [:refresh_details, :export_as_csv, :manually_add_books]
+  
+  def manually_add_books
+    BookDetail.manually_add_books
+    flash.now[:notice] = "Book Details Fetch completed"
+  end
+
   def price_details
     @show_book_details = BookDetail.find_book_with_id(params[:format]).first
     @price_list = BookDetail.book_price(@show_book_details)
@@ -25,7 +33,7 @@ class ScrappersController < ApplicationController
 
   def refresh_details
     BookDetail.create_or_find_book_details!(Utilities::Scrappers::Scrapper.collect)
-    redirect_to root_path
+    flash.now[:notice] = "Refresh book detail completed"
   end
 
   def find_book_price
@@ -76,4 +84,13 @@ class ScrappersController < ApplicationController
               :disposition => "attachment; filename=#{@outfile}"
 
   end
+
+  protected
+
+  def check_if_admin
+    if signed_in?
+      redirect_to root_path unless current_user.admin?
+    end
+  end
+  
 end

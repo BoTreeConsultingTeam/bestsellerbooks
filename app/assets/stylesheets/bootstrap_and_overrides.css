@@ -25,13 +25,16 @@ abbr[title], abbr[data-original-title] {
 	height: 41px;
 }
 .isbn {
-  width: 30%;
-}
-.destroy {
   width: 20%;
 }
+.destroy {
+  width: 10%;
+}
 .title {
-  width: 50%;
+  width: 45%;
+}
+.occurrence {
+  width: 15%;
 }
 .create_book {
   margin-bottom: 8px;
@@ -41,4 +44,10 @@ abbr[title], abbr[data-original-title] {
 }
 .pagination {
   margin-top: 0px;
+}
+.user_status {
+  margin-bottom: 18px;
+}
+.margin_bottom_0 {
+  margin-bottom: 0px;
 }

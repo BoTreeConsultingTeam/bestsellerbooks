@@ -1,11 +1,11 @@
 Bestsellerbooks::Application.routes.draw do
   
   root :to => 'scrappers#show_latest_books'
-  devise_for :users, :controllers => { :registrations => "my_registrations" }
+  devise_for :users
   resources :users do
-    get "sign_in", :to => "my_registrations#new"
-    get "sign_out", :to => 'scrappers#show_latest_books' 
+    get "sign_out", to: 'scrappers#show_latest_books'
   end
+  get 'books/manually_add_books', to: "scrappers#manually_add_books", as: 'manually_add_books'
   get 'books/price_details', to: "scrappers#price_details", as: 'price_details'
   get 'books/refresh_details', to: 'scrappers#refresh_details', as: 'refresh_details'
   get "books/show",to: 'scrappers#show', as: "show"

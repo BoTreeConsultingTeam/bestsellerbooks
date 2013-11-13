@@ -36,7 +36,18 @@ $(document).ready(function(){
           $(".categor_label").text("Bestseller - " + $(this).text());
         }
   });
-
+  $(".refresh_book_details").on("click",
+    function(event) {
+      $.blockUI({ css: { 
+              border: 'none', 
+              padding: '15px', 
+              backgroundColor: '#000', 
+              '-webkit-border-radius': '10px', 
+              '-moz-border-radius': '10px', 
+              opacity: .5, 
+              color: '#fff' 
+          } }); 
+    });
   $("#search-ajax").on("click",
     function(event) {
       $(".categor_label").text("Search result - " + $("#search").val());

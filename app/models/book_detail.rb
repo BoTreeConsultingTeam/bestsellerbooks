@@ -37,27 +37,26 @@ class BookDetail < ActiveRecord::Base
         logger.debug "error message...#{e.message}"
       end
     end
-    self.manually_add_book
+    self.manually_add_books
   end
 
-  def self.manually_add_book
+  def self.manually_add_books
     logger.debug "manually add books start"
-    book_isbn = BestsellerIsbn.pluck(:isbn)
-    book_isbn.map do |isbn|
-      url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
+    bestseller_isbn_books = BestsellerIsbn.all
+    bestseller_isbn_books.map do |bestseller_isbn_book|
+      url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + bestseller_isbn_book.isbn + "&rh=n%3A976389031%2Ck%3A" + bestseller_isbn_book.isbn
       amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
       amazon.process_page
       book_data = amazon.book_details
-      unless book_data.nil?
+      unless book_data.empty?
         data = book_data[0]
-        book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating], occurrence: 0)
+        book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating], occurrence: bestseller_isbn_book.occurrence)
         if book_details.persisted?
-          book = self.find_book_with_isbn(data[:isbn]).first
-          sites_id = book.book_metas.pluck(:site_id)
-          book_meta = self.find_book_meta(book, data[:isbn], sites_id)
+          sites_id = book_details.book_metas.pluck(:site_id)
+          book_meta = self.find_book_meta(book_details, data[:isbn], sites_id)
           book_meta_hash = {}
           book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
-          self.updated_book_meta(book, sites_id, book_meta_hash)
+          self.updated_book_meta(book_details, sites_id, book_meta_hash)
         else
           book_details.save
           self.create_category_details(data[:category], book_details) unless data[:category].nil?
@@ -125,39 +124,33 @@ class BookDetail < ActiveRecord::Base
       case site[:name]
         when "crossword"
           url = "http://www.crossword.in/books/search?q=" + isbn
-          crossword = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:crossword, url)
-          book_data = self.process_search_book_data(crossword, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:crossword, isbn, site[:id], book_data, url, book_details)
         when "flipkart"
           url = "http://www.flipkart.com/search?q=" + isbn
-          flipkart = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:flipkart, url)
-          book_data = self.process_search_book_data(flipkart, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:flipkart, isbn, site[:id], book_data, url, book_details)
         when "amazon"
           url = "http://www.amazon.in/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + isbn + "&rh=n%3A976389031%2Ck%3A" + isbn
-          amazon = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:amazon, url)
-          book_data = self.process_search_book_data(amazon, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:amazon, isbn, site[:id], book_data, url, book_details)
         when "landmarkonthenet"
           url = "http://www.landmarkonthenet.com/search/?q=" + isbn
-          landmarkonthenet = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:landmark, url)
-          book_data = self.process_search_book_data(landmarkonthenet, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:landmarkonthenet, isbn, site[:id], book_data, url, book_details)
         when "uread"
           url = "http://www.uread.com/search-books/" + isbn
-          uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:uread, url)
-          book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:uread, isbn, site[:id], book_data, url, book_details)
         when "homeshop18"
           url = "http://www.homeshop18.com/search:" + isbn
-          uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:homeshop18, url)
-          book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:homeshop18, isbn, site[:id], book_data, url, book_details)
         when "indiatimes"
           url = "http://shopping.indiatimes.com/mtkeywordsearch?SEARCH_STRING=" + isbn + "&catalog=10011"
-          uread = Utilities::Scrappers::Scrapper.get_search_page_scrapper(:indiatimes, url)
-          book_data = self.process_search_book_data(uread, isbn, site[:id], book_data, url, book_details)
+          book_data = self.process_search_book_data(:indiatimes, isbn, site[:id], book_data, url, book_details)
       end
     end
     logger.debug "#{book_data}"
     book_data
   end
 
-  def self.process_search_book_data(site_data, isbn, site_ids, all_book_data, url, book)
+  def self.process_search_book_data(site, isbn, site_ids, all_book_data, url, book)
+    site_data = Utilities::Scrappers::Scrapper.get_search_page_scrapper(site, url)
     unless site_data.nil?
       site_data.process_page
       book_data = site_data.book_details
@@ -175,15 +168,13 @@ class BookDetail < ActiveRecord::Base
   end
 
   def self.create_category_details(categories_from_site, book_details)
-    categories_from_site.each do |categories|
-      sub_categories = categories.split
-      sub_categories.each do |sub_category|
-        if sub_category.length > 3
-          book_categories = BookCategory.where("category_name ilike '%#{sub_category.gsub(/'s/,'')}%'")
-          book_categories.map { |book_category| book_details.book_categories << book_category unless book_details.book_categories.include?(book_category) }
-        end
-      end
-    end
+    sub_categories = []
+    categories_from_site.each { |categories| sub_categories << categories.split }
+    sub_categories = sub_categories.flatten
+    book_categories = []
+    sub_categories.each { |sub_category| book_categories << BookCategory.where("category_name ilike '%#{sub_category.gsub(/'s/,'')}%'") if sub_category.length > 3 }
+    book_categories = book_categories.flatten
+    book_categories.map { |book_category| book_details.book_categories << book_category unless book_details.book_categories.include?(book_category) }
   end
 
   def self.show_books_details(page)

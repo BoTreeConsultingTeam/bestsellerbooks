@@ -6,20 +6,21 @@ class ManuallyAddIsbnController < ApplicationController
   end
 
   def create
-  	book_isbn = BestsellerIsbn.create_book_isbn(params[:isbn], params[:book_title])
-    if book_isbn.id.nil?
-      flash.now[:alert] = "Please check book title and isbn"
-    elsif !book_isbn.id.nil? && !book_isbn.persisted?
-      flash.now[:notice] = "book created"
-    else
+  	book_isbn = BestsellerIsbn.create_book_isbn(params[:isbn], params[:book_title], params[:occurrence])
+    if book_isbn.persisted?
       flash.now[:alert] = "Book already exist"
+    elsif book_isbn.new_record? && !book_isbn.isbn.empty? && !book_isbn.title.empty? && !book_isbn.occurrence.nil?
+      book_isbn.save
+      flash.now[:notice] = "Book created"
+    else
+      flash.now[:alert] = "Please check book title, isbn and occurrence"
     end
     @books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
   end
 
   def destroy
   	BestsellerIsbn.destroy_book_isbn(params[:manually_add_isbn_id])
-    if params[:manually_add_isbn_id] == "0"
+    if params[:search] == "0"
       @books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
     else
       @books_isbn = BestsellerIsbn.find_book(params[:search], params[:page])
@@ -33,7 +34,7 @@ class ManuallyAddIsbnController < ApplicationController
       params[:search] = params[:search].gsub("'","''")
     end
     @books_isbn = BestsellerIsbn.find_book(params[:search], params[:page])
-    @search = params[:search].gsub("''","'")
+    @search = params[:search]
   end
 
   def show

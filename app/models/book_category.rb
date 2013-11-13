@@ -8,8 +8,7 @@ class BookCategory < ActiveRecord::Base
   scope :book_category, pluck([:category_name])
 
   def self.books_category(id, page)
-    book_data = BookCategory.find(id).book_details.order('occurrence DESC', 'average_rating DESC').page(page).per(12).uniq
-    book_data
+    BookCategory.find(id).book_details.order('occurrence DESC', 'average_rating DESC').page(page).per(12).uniq
   end
   
 end
