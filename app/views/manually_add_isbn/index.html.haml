@@ -1,9 +1,12 @@
 .row
-	.span6.offset2
-		= render :partial => 'create_book_isbn'
+	.span8.offset2
+		.container-fluid.index-top
+			.nav.pull-left
+				#refresh_manually_isbn= render :partial => 'refresh_isbn_book'
+			.nav.pull-right
+				= form_tag manually_add_isbn_search_path, method: :get, class: "form-search", remote: true, class: "margin_bottom_0" do
+					= text_field_tag :search, nil
+					= submit_tag "Search Book", class: "btn btn-primary search-btn"
 .row
 	.span8.offset2
-		= form_tag manually_add_isbn_search_path, method: :get, remote: true, class: "margin_bottom_0" do
-			= text_field_tag :search, nil
-			= submit_tag "search Book", class: "btn btn-primary create_book"
 		#display_book_isbn= render :partial => 'book_isbn', :locals => { paginate_action: "show" }

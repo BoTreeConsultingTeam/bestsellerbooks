@@ -1,0 +1,5 @@
+%a.btn.btn-primary{ :href => new_manually_add_isbn_path, "data-remote" => true }
+	Create ISBN
+- unless @books_isbn.empty?
+	%a.btn.btn-primary.refresh_book_details{ :href => manually_add_books_path, "data-remote" => true }
+		Add to site

@@ -2,7 +2,7 @@
 
 class ScrappersController < ApplicationController
 
-  before_filter :authenticate_user!, :check_if_admin, :only => [:refresh_details, :export_as_csv, :manually_add_books]
+  before_filter :authenticate_user!, only: [:refresh_details, :export_as_csv, :manually_add_books]
   
   def manually_add_books
     BookDetail.manually_add_books
@@ -85,12 +85,4 @@ class ScrappersController < ApplicationController
 
   end
 
-  protected
-
-  def check_if_admin
-    if signed_in?
-      redirect_to root_path unless current_user.admin?
-    end
-  end
-  
 end

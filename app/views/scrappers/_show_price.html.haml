@@ -38,17 +38,17 @@
 							- when "indiatimes"
 								= image_tag("indiatimes_ico.ico", size: "20x20")
 					%td{style: "width: 139px;"}
-						= link_to site[:name], "#{price[:book_detail_url] }",target: "_blank"
+						= link_to site[:name], "#{price[:book_detail_url]}",target: "_blank"
 					%td{style: "width: 50px;"}
 						- if price[:price].nil?
 							= "-"
 						- else
-							= link_to price[:price], "#{price[:book_detail_url] }",target: "_blank"
+							= link_to price[:price], "#{price[:book_detail_url]}",target: "_blank"
 					%td{style: "width: 83px;"}
 						- if price[:discount].nil?
 							= "-"
 						- else
-							= link_to price[:discount], "#{price[:book_detail_url] }",target: "_blank"
+							= link_to price[:discount], "#{price[:book_detail_url]}",target: "_blank"
 							\%
 					%td
 						- if price[:rating].nil?
@@ -60,6 +60,6 @@
 					%td
 						= price[:delivery_days]
 					%td
-						%a{href: "#{price[:book_detail_url] }",target: "_blank"}
+						%a{href: "#{price[:book_detail_url]}",target: "_blank"}
 							%i.icon-shopping-cart
 	.ajax-progress-1

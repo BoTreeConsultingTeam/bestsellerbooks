@@ -1,13 +1,30 @@
 %header.navbar.navbar-inverse
   %nav.navbar-inner
     .container-fluid
-      - website = "Bestseller Books"
-      = link_to website, root_path,class: "brand"
-      = form_tag show_path, method: :get,remote: true,class: "navbar-search pull-center",style: "padding-right: 0px; border-right-width: 0px; margin-right: 0px; right: -163px;" do
-        = text_field_tag :search, nil,  class: "search-query", placeholder: "Search within #{website}",style: "width: 400px;"
-        = submit_tag "search", class: "btn btn-success",id: 'search-ajax', style: "margin-top: 0px;"
+      - if user_signed_in?
+        - website = "Bestseller Books"
+        = link_to website, manually_add_isbn_index_path, class: "brand"
+      -else
+        - website = "Bestseller Books"
+        = link_to website, root_path, class: "brand"
+        = form_tag show_path, method: :get,remote: true,class: "navbar-search pull-center",style: "padding-right: 0px; border-right-width: 0px; margin-right: 0px; right: -163px;" do
+          = text_field_tag :search, nil,  class: "search-query", placeholder: "Search within #{website}",style: "width: 400px;"
+          = submit_tag "search", class: "btn btn-success",id: 'search-ajax', style: "margin-top: 0px;"
       %ul.nav.pull-right
         %li
-          %a{href: "http://www.botreeconsulting.com"}
-            Powered by
-            %strong BoTree Consulting
+          - if user_signed_in?
+            %div.white
+              Logged in as
+              %strong= current_user.name
+              |
+              %a
+                = link_to 'Edit profile', edit_user_registration_path, :class => 'navbar-link'
+                |
+                = link_to "Refresh Book Details", refresh_details_path, method: :get, :class => 'navbar-link refresh_book_details', remote: true
+                = link_to "Create Admin", new_user_session_path, :class => 'navbar-link'
+                |
+                = link_to "Logout", destroy_user_session_path, method: :get, :class => 'navbar-link'
+          - else
+            %a{ href: "http://www.botreeconsulting.com", :class => 'navbar-link' }
+              Powered by
+              %strong BoTree Consulting

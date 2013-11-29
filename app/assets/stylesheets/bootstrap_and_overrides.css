@@ -30,9 +30,6 @@ abbr[title], abbr[data-original-title] {
 .destroy {
   width: 10%;
 }
-.title {
-  width: 45%;
-}
 .occurrence {
   width: 15%;
 }
@@ -50,4 +47,20 @@ abbr[title], abbr[data-original-title] {
 }
 .margin_bottom_0 {
   margin-bottom: 0px;
+}
+.white {
+  color: white;
+  padding-top: 8px;
+}
+.title {
+  padding-top: 10px;
+  width: 626px;
+  text-decoration: none;
+  width: 500px;
+}
+.search-btn {
+  margin-bottom: 10px;
+}
+.index-top {
+  padding-left: 0px; padding-right: 0px;
 }

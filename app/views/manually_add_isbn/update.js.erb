@@ -1,4 +1,4 @@
+$('#dialog').dialog( "close" );
 $('#display_book_isbn').html('<%= escape_javascript(render :partial => 'book_isbn',
- :locals => { paginate_action: "show" }) %>');
-$('#refresh_manually_isbn').html('<%= escape_javascript(render :partial => 'refresh_isbn_book') %>');
+ :locals => { paginate_action: "update" }) %>');
 $('#flash_div').html('<%= escape_javascript(render :partial => 'layouts/flash') %>');

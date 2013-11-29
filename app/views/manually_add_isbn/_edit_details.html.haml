@@ -1,0 +1,8 @@
+= render partial: "layouts/flash"
+.row
+	.span5.offset1
+		= form_for(@book, url: manually_add_isbn_update_path(@book), method: :post, remote: true) do |book|
+			= render :partial => 'book_isbn_form', locals: { book: book }
+			%dt
+			%dd
+				= book.button 'Update', class: "btn btn-primary"

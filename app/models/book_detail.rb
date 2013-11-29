@@ -17,6 +17,7 @@ class BookDetail < ActiveRecord::Base
     books.each do |key, value|
       begin
         meta = self.calculate_rating_avg(books[key][:book_meta_data])
+        meta[0] = 0 if meta[0].nil?
         book_details = self.where(isbn: key).first_or_initialize(author: value[:author], images: value[:img], title: value[:title], language: value[:language], publisher: value[:publisher], description: value[:description], average_rating: meta[0], occurrence: meta[1])
         unless book_details.persisted? 
           site_id = []
@@ -50,12 +51,14 @@ class BookDetail < ActiveRecord::Base
       book_data = amazon.book_details
       unless book_data.empty?
         data = book_data[0]
+        data[:rating] = 0 if data[:rating].nil?
         book_details = self.where(isbn: data[:isbn]).first_or_initialize(author: data[:author], images: data[:img], title: data[:title], language: data[:language], publisher: data[:publisher], description: data[:description], average_rating: data[:rating], occurrence: bestseller_isbn_book.occurrence)
         if book_details.persisted?
           sites_id = book_details.book_metas.pluck(:site_id)
           book_meta = self.find_book_meta(book_details, data[:isbn], sites_id)
           book_meta_hash = {}
           book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
+          book_details.update_attributes(occurrence: bestseller_isbn_book.occurrence)
           self.updated_book_meta(book_details, sites_id, book_meta_hash)
         else
           book_details.save
@@ -214,6 +217,7 @@ class BookDetail < ActiveRecord::Base
         book_meta.each { |meta| book_meta_hash.merge!("#{meta[:site_id]}" => meta) }
         self.updated_book_meta(book_details, site_to_be_update, book_meta_hash)
         meta = self.calculate_rating_avg(book_meta_data.merge!(book_meta_hash))
+        meta[0] = 0 if meta[0].nil?
         book_details.update_attributes(average_rating: meta[0], occurrence: site_id_new_list.count)
       else
         self.find_book_with_isbn(isbn_key).first.destroy

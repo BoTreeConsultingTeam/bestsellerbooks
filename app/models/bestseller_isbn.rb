@@ -7,8 +7,8 @@ class BestsellerIsbn < ActiveRecord::Base
   	BestsellerIsbn.order("created_at DESC").page(page).per(10)
   end
 
-  def self.create_book_isbn(isbn, title, occurrence)
-  	BestsellerIsbn.where(isbn: isbn).first_or_initialize(title: title, occurrence: occurrence)
+  def self.create_book_isbn(bestseller_isbn)
+  	BestsellerIsbn.where(isbn: bestseller_isbn["isbn"]).first_or_initialize(bestseller_isbn)
   end
 
   def self.destroy_book_isbn(book_id)

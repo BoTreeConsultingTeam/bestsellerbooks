@@ -1,32 +1,54 @@
 class ManuallyAddIsbnController < ApplicationController
-  before_filter :authenticate_user!, :check_if_admin
-  
+  before_filter :authenticate_user!
+
+  def new
+    @book = BestsellerIsbn.new 
+  end
+
   def index
   	@books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
   end
 
   def create
-  	book_isbn = BestsellerIsbn.create_book_isbn(params[:isbn], params[:book_title], params[:occurrence])
+  	book_isbn = BestsellerIsbn.create_book_isbn(params[:bestseller_isbn])
     if book_isbn.persisted?
+      @book = BestsellerIsbn.new(params[:bestseller_isbn])
       flash.now[:alert] = "Book already exist"
-    elsif book_isbn.new_record? && !book_isbn.isbn.empty? && !book_isbn.title.empty? && !book_isbn.occurrence.nil?
-      book_isbn.save
+      render :new
+    elsif book_isbn.save
       flash.now[:notice] = "Book created"
     else
-      flash.now[:alert] = "Please check book title, isbn and occurrence"
+      @book = BestsellerIsbn.new(params[:bestseller_isbn])
+      flash[:alert] = "Please check book title, isbn and occurrence"
+      render :new
     end
     @books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
   end
 
   def destroy
   	BestsellerIsbn.destroy_book_isbn(params[:manually_add_isbn_id])
-    if params[:search] == "0"
+    if params[:search] == "null"
       @books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
     else
       @books_isbn = BestsellerIsbn.find_book(params[:search], params[:page])
     end
     @search = params[:search]
     flash.now[:notice] = "book deleted"
+  end
+
+  def edit
+    @book = BestsellerIsbn.find(params[:id])
+  end
+
+  def update
+    @book = BestsellerIsbn.find(params[:bestseller_isbn]["id"])
+    if @book.update_attributes(params[:bestseller_isbn])
+      flash.now[:notice] = "Book updated"
+    else
+      render :edit
+      flash[:error] = "Book update fails"
+    end
+    @books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
   end
 
   def search
@@ -40,13 +62,5 @@ class ManuallyAddIsbnController < ApplicationController
   def show
     @books_isbn = BestsellerIsbn.find_book_isbn(params[:page])
   end
-  
-  protected
-  
-  def check_if_admin
-    if signed_in?
-      redirect_to root_path unless current_user.admin?
-    end
-  end
-  
+    
 end
